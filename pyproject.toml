@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "exportlake"
+version = "1.0.0"
+description = "Automated Fabric-ready sales analytics: contract-driven pipeline, star schema and PBIP semantic model for a fictional B2B exporter."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Dhrukumar Valand" }]
+dependencies = [
+  "polars>=1.0",
+  "pyarrow>=15",
+  "deltalake>=0.18",
+  "pyyaml>=6",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "jsonschema>=4.18", "referencing>=0.30", "pyflakes>=3"]
+deploy = ["fabric-cicd>=0.1.20", "azure-identity>=1.15"]
+
+[project.scripts]
+exportlake = "exportlake.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+exportlake = ["contracts/*.yaml", "dashboard_template.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

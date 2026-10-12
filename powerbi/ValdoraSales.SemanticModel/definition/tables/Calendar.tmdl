@@ -1,0 +1,175 @@
+/// Conformed calendar. Marked as date table. Has Actuals separates loaded days from the future.
+table Calendar
+	dataCategory: Time
+	lineageTag: cf643a97-7d88-59c2-a901-157d0bd1ea68
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: dd.mm.yyyy
+		lineageTag: c60cef99-c55a-5e4a-bdae-a14ff163579c
+		summarizeBy: none
+		sourceColumn: date
+
+		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2a117b34-3875-543f-bcb7-37bee5fd7fee
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = User
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 9cd5ec31-be8c-5dd9-a5ae-cfbc951ea606
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = User
+
+	column Quarter
+		dataType: string
+		lineageTag: 78cfe036-2224-5130-8440-88ce3cc99a05
+		summarizeBy: none
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = User
+
+	column 'Year Quarter'
+		dataType: string
+		lineageTag: 896d6dc4-83d3-54a0-82dd-dbc3e5caba91
+		summarizeBy: none
+		sourceColumn: year_quarter
+
+		annotation SummarizationSetBy = User
+
+	column 'Month No'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 873c7c6f-8c32-5ee7-834e-d1e86797ebca
+		summarizeBy: none
+		sourceColumn: month_no
+
+		annotation SummarizationSetBy = User
+
+	column Month
+		dataType: string
+		lineageTag: 249b87ca-4228-59da-a7c1-797817434c59
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: 'Month No'
+
+		annotation SummarizationSetBy = User
+
+	column 'Month Short'
+		dataType: string
+		lineageTag: 3af99c1d-772a-52b8-9dbe-275afa50cd75
+		summarizeBy: none
+		sourceColumn: month_short
+		sortByColumn: 'Month No'
+
+		annotation SummarizationSetBy = User
+
+	column 'Year Month No'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0039258f-1ec2-548f-9403-4280d8db2aea
+		summarizeBy: none
+		sourceColumn: year_month_no
+
+		annotation SummarizationSetBy = User
+
+	column 'Year Month'
+		dataType: string
+		lineageTag: 3a2b205a-d81b-573b-bfeb-a09f638cbcec
+		summarizeBy: none
+		sourceColumn: year_month
+		sortByColumn: 'Year Month No'
+
+		annotation SummarizationSetBy = User
+
+	column 'Month Start'
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: 7f5e1859-3681-51ca-8776-610932219e52
+		summarizeBy: none
+		sourceColumn: month_start
+
+		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'ISO Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: fa12513c-29d4-5368-9e7e-07d2c07d1f10
+		summarizeBy: none
+		sourceColumn: iso_week
+
+		annotation SummarizationSetBy = User
+
+	column 'Weekday No'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6ac264dd-8de5-566a-b7a0-d89fd0a2ebea
+		summarizeBy: none
+		sourceColumn: weekday_no
+
+		annotation SummarizationSetBy = User
+
+	column Weekday
+		dataType: string
+		lineageTag: f5cd74b7-c18e-5c98-86d6-d99fd7b05ef7
+		summarizeBy: none
+		sourceColumn: weekday
+		sortByColumn: 'Weekday No'
+
+		annotation SummarizationSetBy = User
+
+	column 'Day of Month'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a116205e-cefd-5d71-986e-209102d70208
+		summarizeBy: none
+		sourceColumn: day_of_month
+
+		annotation SummarizationSetBy = User
+
+	column 'Is Working Day'
+		dataType: boolean
+		lineageTag: c486223d-e346-5008-b6c2-a2efe67645c6
+		summarizeBy: none
+		sourceColumn: is_working_day
+
+		annotation SummarizationSetBy = User
+
+	/// TRUE up to the last business day loaded by the pipeline.
+	column 'Has Actuals'
+		dataType: boolean
+		lineageTag: 6ecd7908-1616-5451-a77e-f599baef4388
+		summarizeBy: none
+		sourceColumn: has_actuals
+
+		annotation SummarizationSetBy = User
+
+	partition Calendar = m
+		mode: import
+		source =
+				let
+				    Source = fnReadGold("dim_date"),
+				    Typed = Table.TransformColumnTypes(Source, {{"date", type date}, {"date_key", Int64.Type}, {"year", Int64.Type}, {"quarter", type text}, {"year_quarter", type text}, {"month_no", Int64.Type}, {"month_name", type text}, {"month_short", type text}, {"year_month_no", Int64.Type}, {"year_month", type text}, {"month_start", type date}, {"iso_week", Int64.Type}, {"weekday_no", Int64.Type}, {"weekday", type text}, {"day_of_month", Int64.Type}, {"is_working_day", type logical}, {"has_actuals", type logical}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

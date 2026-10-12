@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "ExportLake_Daily",
+    "description": "Daily load: data contracts -> star schema -> Delta tables in OneLake"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1d4cf576-49c7-5dcb-b8ac-ebbc847f79a0"
+  }
+}

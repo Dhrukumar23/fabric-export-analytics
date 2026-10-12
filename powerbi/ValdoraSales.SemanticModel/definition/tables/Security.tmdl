@@ -1,0 +1,31 @@
+/// Maps user e-mails to the countries they may see (row-level security).
+table Security
+	isHidden
+	lineageTag: 1ba19c94-8112-51fe-a378-83c30d58d29f
+
+	column 'User Principal'
+		dataType: string
+		lineageTag: 3331d960-2d1a-5d73-a3de-01760c5a02fe
+		summarizeBy: none
+		sourceColumn: user_principal
+
+		annotation SummarizationSetBy = User
+
+	column 'Country Code'
+		dataType: string
+		lineageTag: 7eac8907-169f-58f9-8f30-e2f98688b796
+		summarizeBy: none
+		sourceColumn: country_code
+
+		annotation SummarizationSetBy = User
+
+	partition Security = m
+		mode: import
+		source =
+				let
+				    Source = fnReadGold("rls_user_country"),
+				    Typed = Table.TransformColumnTypes(Source, {{"user_principal", type text}, {"country_code", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

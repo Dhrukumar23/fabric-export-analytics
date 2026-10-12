@@ -1,0 +1,12 @@
+dataContract: sales_budget
+version: 1.0.0
+owner: Controlling
+description: Yearly revenue budget per country, delivered wide (one column per month) in EUR thousands.
+source: {system: Controlling (Excel), format: csv, delimiter: ";", encoding: cp1252, numberFormat: de-DE, delivery: once per year}
+grain: one row per country and month (after unpivot)
+primaryKey: [country_name, month_start]
+onDuplicate: fail
+columns:
+  country_name: {type: string, required: true, allowed: [Germany, Switzerland, France, Italy, United Kingdom, Poland, Sweden, United States, Japan]}
+  month_start:  {type: date, required: true}
+  target_eur:   {type: decimal, required: true, min: 0}

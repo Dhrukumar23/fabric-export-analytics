@@ -1,0 +1,149 @@
+/// One row per data-contract check per load. Appended on every pipeline run.
+table 'Data Quality'
+	lineageTag: bae25aa5-8603-5ab3-898b-dc251be1bf38
+
+	measure 'Rows Quarantined' = CALCULATE ( SUM ( 'Data Quality'[Rows Failed] ), 'Data Quality'[Action] = "quarantined" ) + 0
+		formatString: #,0
+		lineageTag: c08427c5-7c26-5a74-bf33-722ae1f8c10c
+
+	measure 'Values Auto-Fixed' = CALCULATE ( SUM ( 'Data Quality'[Rows Failed] ), 'Data Quality'[Action] = "auto-fixed" ) + 0
+		formatString: #,0
+		lineageTag: be20acb4-135d-55e5-906c-3a1577056e3a
+
+	measure 'Duplicates Removed' = CALCULATE ( SUM ( 'Data Quality'[Rows Failed] ), 'Data Quality'[Action] = "deduplicated" ) + 0
+		formatString: #,0
+		lineageTag: 061d1feb-e06a-500b-99fc-faeb6689949b
+
+	measure 'ERP Rows Received' = CALCULATE ( SUM ( 'Data Quality'[Rows Checked] ), 'Data Quality'[Contract] = "erp_order_lines", 'Data Quality'[Check] = "order_id: required" )
+		formatString: #,0
+		lineageTag: df934d2f-f8b9-5b4a-9df5-4c0a9d51d073
+
+	measure 'Quarantine Rate' = DIVIDE ( CALCULATE ( [Rows Quarantined], 'Data Quality'[Contract] = "erp_order_lines" ), [ERP Rows Received] )
+		formatString: 0.00%
+		lineageTag: 40716317-9d4d-520a-a5e9-8d249d8dd1fa
+
+	measure 'Contract Checks Run' = COUNTROWS ( 'Data Quality' )
+		formatString: #,0
+		lineageTag: d888d0d6-f2f6-5dee-ba99-babbee6f7f97
+
+	measure 'Last Pipeline Run' = CALCULATE ( MAX ( 'Data Quality'[Run Timestamp] ), REMOVEFILTERS () )
+		formatString: dd.mm.yyyy hh:nn
+		lineageTag: 08714f84-b841-5f0f-8cd9-ac5456ab173f
+
+	/// Days between the last loaded business date and today. Alert if > 3.
+	measure 'Data Age (days)' = DATEDIFF ( [Last Actual Date], TODAY (), DAY )
+		formatString: 0
+		lineageTag: 54ff0f27-7b31-5859-b9b6-f6a685ca248c
+
+	column Contract
+		dataType: string
+		lineageTag: 2c1d17f2-25f5-589e-b1a8-3b08de45366b
+		summarizeBy: none
+		sourceColumn: contract
+
+		annotation SummarizationSetBy = User
+
+	column File
+		dataType: string
+		lineageTag: 321a649c-103a-5693-bc60-4ac0c1314ee9
+		summarizeBy: none
+		sourceColumn: file
+
+		annotation SummarizationSetBy = User
+
+	column Check
+		dataType: string
+		lineageTag: 5ba32b1d-2265-5a9b-b96f-594c80a0d2a3
+		summarizeBy: none
+		sourceColumn: check
+
+		annotation SummarizationSetBy = User
+
+	column 'Rows Checked'
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: b513cd90-6199-553b-953b-f92b05a4abb8
+		summarizeBy: none
+		sourceColumn: rows_checked
+
+		annotation SummarizationSetBy = User
+
+	column 'Rows Failed'
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 1ba7f938-3f08-53f5-958a-f3fe4cf337d4
+		summarizeBy: none
+		sourceColumn: rows_failed
+
+		annotation SummarizationSetBy = User
+
+	column Severity
+		dataType: string
+		lineageTag: 5052355e-b1d4-55f0-89ff-235d76a0eb2f
+		summarizeBy: none
+		sourceColumn: severity
+
+		annotation SummarizationSetBy = User
+
+	column Action
+		dataType: string
+		lineageTag: 6d551f66-6351-596c-aa56-bcffbf50ed57
+		summarizeBy: none
+		sourceColumn: action
+
+		annotation SummarizationSetBy = User
+
+	column 'Check Date'
+		dataType: dateTime
+		isHidden
+		formatString: dd.mm.yyyy
+		lineageTag: 6f83fdef-f3ba-53fb-afcd-30596ff36b44
+		summarizeBy: none
+		sourceColumn: check_date
+
+		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Run ID'
+		dataType: string
+		lineageTag: cf482fde-0ae4-5680-820e-d352bfed1aa7
+		summarizeBy: none
+		sourceColumn: run_id
+
+		annotation SummarizationSetBy = User
+
+	column 'Run Timestamp'
+		dataType: dateTime
+		isHidden
+		formatString: dd.mm.yyyy hh:nn
+		lineageTag: 2487784e-6f61-519a-b9a8-2e5c3bb67f21
+		summarizeBy: none
+		sourceColumn: run_timestamp
+
+		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = DateTime
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e5c29d6e-720d-50bb-a221-9c49ed0fa6da
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = User
+
+	partition 'Data Quality' = m
+		mode: import
+		source =
+				let
+				    Source = fnReadGold("fact_data_quality"),
+				    Typed = Table.TransformColumnTypes(Source, {{"contract", type text}, {"file", type text}, {"check", type text}, {"rows_checked", Int64.Type}, {"rows_failed", Int64.Type}, {"severity", type text}, {"action", type text}, {"check_date", type date}, {"run_id", type text}, {"run_timestamp", type datetime}, {"date_key", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

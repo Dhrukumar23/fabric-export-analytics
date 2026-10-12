@@ -1,0 +1,136 @@
+/// SCD Type 2: segment and sales rep keep their history, so revenue is reported with the attributes valid at order time.
+table Customer
+	lineageTag: 097a0141-bea6-5f07-8970-bb32bc474045
+
+	column 'Customer SK'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9a219042-1233-5996-922a-fc6f999b4657
+		summarizeBy: none
+		sourceColumn: customer_sk
+
+		annotation SummarizationSetBy = User
+
+	column 'Customer ID'
+		dataType: string
+		lineageTag: d6553c05-7bd6-50a4-93cc-2a7655afdd64
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = User
+
+	column Customer
+		dataType: string
+		lineageTag: d8966dbf-a826-5e67-a63b-21aeeb704386
+		summarizeBy: none
+		sourceColumn: customer_name
+
+		annotation SummarizationSetBy = User
+
+	column 'Customer Country'
+		dataType: string
+		lineageTag: ce08e743-fe93-5d78-b36f-9558a948f3e1
+		summarizeBy: none
+		sourceColumn: country_code
+
+		annotation SummarizationSetBy = User
+
+	column Segment
+		dataType: string
+		lineageTag: 903e9f2e-9508-5042-87dd-c29accfc964c
+		summarizeBy: none
+		sourceColumn: segment
+
+		annotation SummarizationSetBy = User
+
+	column 'Is Key Account'
+		dataType: boolean
+		lineageTag: 6bc6b13c-071e-5226-abde-d93baeb0f4c8
+		summarizeBy: none
+		sourceColumn: is_key_account
+
+		annotation SummarizationSetBy = User
+
+	column 'Sales Rep'
+		dataType: string
+		lineageTag: f4751a0d-dc30-5e15-b048-fd12c9ed616e
+		summarizeBy: none
+		sourceColumn: sales_rep
+
+		annotation SummarizationSetBy = User
+
+	column 'Customer Since'
+		dataType: dateTime
+		formatString: dd.mm.yyyy
+		lineageTag: 2e3a23c9-6c67-5b48-8f76-97e8450c0b0c
+		summarizeBy: none
+		sourceColumn: customer_since
+
+		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Valid From'
+		dataType: dateTime
+		formatString: dd.mm.yyyy
+		displayFolder: SCD Type 2
+		lineageTag: 3b36977e-9ae8-5979-aa8f-04c8698e232a
+		summarizeBy: none
+		sourceColumn: valid_from
+
+		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Valid To'
+		dataType: dateTime
+		formatString: dd.mm.yyyy
+		displayFolder: SCD Type 2
+		lineageTag: e573b17d-3089-5907-aea5-275d60f8318e
+		summarizeBy: none
+		sourceColumn: valid_to
+
+		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Is Current'
+		dataType: boolean
+		displayFolder: SCD Type 2
+		lineageTag: 0125d3de-8a37-524e-817c-81ec14da54b3
+		summarizeBy: none
+		sourceColumn: is_current
+
+		annotation SummarizationSetBy = User
+
+	/// Placeholder created when an order arrived before the CRM record (late-arriving dimension).
+	column 'Is Inferred'
+		dataType: boolean
+		displayFolder: SCD Type 2
+		lineageTag: d53cb131-94d8-5e17-9978-6fec5d64f31a
+		summarizeBy: none
+		sourceColumn: is_inferred
+
+		annotation SummarizationSetBy = User
+
+	column Version
+		dataType: int64
+		formatString: 0
+		displayFolder: SCD Type 2
+		lineageTag: f6310163-4e2a-58b3-b583-13667168fde5
+		summarizeBy: none
+		sourceColumn: version
+
+		annotation SummarizationSetBy = User
+
+	partition Customer = m
+		mode: import
+		source =
+				let
+				    Source = fnReadGold("dim_customer"),
+				    Typed = Table.TransformColumnTypes(Source, {{"customer_sk", Int64.Type}, {"customer_id", type text}, {"customer_name", type text}, {"country_code", type text}, {"segment", type text}, {"is_key_account", type logical}, {"sales_rep", type text}, {"customer_since", type date}, {"valid_from", type date}, {"valid_to", type date}, {"is_current", type logical}, {"is_inferred", type logical}, {"version", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

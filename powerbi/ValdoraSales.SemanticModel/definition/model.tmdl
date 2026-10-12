@@ -1,0 +1,29 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["GoldFolder", "fnReadGold", "Sales", "Calendar", "Country", "Channel", "Product", "Customer", "Target", "FX Rate", "Data Quality", "Security"]
+
+annotation PBI_ProTooling = ["DevMode","CalcGroup","TMDLView_Desktop"]
+
+ref table Sales
+ref table Calendar
+ref table Country
+ref table Channel
+ref table Product
+ref table Customer
+ref table Target
+ref table 'FX Rate'
+ref table 'Data Quality'
+ref table Security
+ref table 'Time Calculation'
+
+ref role 'Country Manager'
+ref role 'DACH Sales'

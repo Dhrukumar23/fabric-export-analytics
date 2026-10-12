@@ -1,0 +1,67 @@
+/// ECB euro reference rates, TARGET business days.
+table 'FX Rate'
+	lineageTag: 1748c9a1-dd87-513f-a5b3-82dc525fb73f
+
+	/// Average ECB reference rate, units per 1 EUR.
+	measure 'Avg FX Rate' = AVERAGE ( 'FX Rate'[Rate per EUR] )
+		formatString: 0.0000
+		lineageTag: d9857699-256e-5627-b64c-809d0acc03f3
+
+	/// Positive = currency stronger against EUR than on 1 January.
+	measure 'FX Rate vs Start of Year %' =
+			VAR _rate = [Avg FX Rate]
+			VAR _start = CALCULATE ( [Avg FX Rate], STARTOFYEAR ( 'Calendar'[Date] ) )
+			RETURN DIVIDE ( _start, _rate ) - 1
+		formatString: 0.0%
+		lineageTag: f8accf54-6ec3-5579-b9dd-e904ff91ad42
+
+	column 'Rate Date'
+		dataType: dateTime
+		isHidden
+		formatString: dd.mm.yyyy
+		lineageTag: ec4e66dd-56b4-52ad-b37d-d05b3759ce0a
+		summarizeBy: none
+		sourceColumn: date
+
+		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 09697d31-17ec-5308-b5cf-a76a0838d3f1
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = User
+
+	column Currency
+		dataType: string
+		lineageTag: b59e4099-0f87-52a1-a721-318506534f94
+		summarizeBy: none
+		sourceColumn: currency
+
+		annotation SummarizationSetBy = User
+
+	column 'Rate per EUR'
+		dataType: double
+		isHidden
+		formatString: 0.0000
+		lineageTag: 70ffff03-f90b-56b0-a241-196f8b3906d2
+		summarizeBy: none
+		sourceColumn: rate_per_eur
+
+		annotation SummarizationSetBy = User
+
+	partition 'FX Rate' = m
+		mode: import
+		source =
+				let
+				    Source = fnReadGold("fact_fx_rate"),
+				    Typed = Table.TransformColumnTypes(Source, {{"date", type date}, {"date_key", Int64.Type}, {"currency", type text}, {"rate_per_eur", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

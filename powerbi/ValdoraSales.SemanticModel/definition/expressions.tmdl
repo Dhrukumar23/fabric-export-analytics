@@ -1,0 +1,21 @@
+/// Where the gold Parquet files live. Default: your GitHub repo (updated daily by GitHub Actions).
+/// For local work set it to a folder path ending with a backslash, e.g. C:\\repos\\fabric-export-analytics\\data\\gold\\
+expression GoldFolder = "https://raw.githubusercontent.com/Dhrukumar23/fabric-export-analytics/main/data/gold/" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: bf71bde9-f6b8-59df-ac9e-9e6ed2cc39b0
+
+	annotation PBI_ResultType = Text
+
+/// Reads one gold table (Parquet) from the web or from a local folder.
+expression fnReadGold =
+		(tableName as text) as table =>
+		let
+		    Content = if Text.StartsWith(GoldFolder, "http")
+		        then Web.Contents(GoldFolder, [RelativePath = tableName & ".parquet"])
+		        else File.Contents(GoldFolder & tableName & ".parquet"),
+		    Data = Parquet.Document(Binary.Buffer(Content))
+		in
+		    Data
+	lineageTag: b95fa6e2-982f-55ea-9bb9-67992b071d00
+
+	annotation PBI_ResultType = Function
+

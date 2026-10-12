@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Lakehouse",
+    "displayName": "ExportLake",
+    "description": "Delta tables for the Valdora star schema"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1205a698-d8e5-5057-b9e0-1d857e98ad08"
+  }
+}

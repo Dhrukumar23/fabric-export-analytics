@@ -1,0 +1,35 @@
+relationship f24d8bf7-794b-51e6-913f-acc01c460e82
+	fromColumn: Sales.'Date Key'
+	toColumn: Calendar.'Date Key'
+
+relationship eebbfc9d-1b78-57b5-8f60-dff3d018d318
+	fromColumn: Sales.'Customer SK'
+	toColumn: Customer.'Customer SK'
+
+relationship a8974e9d-e888-58e0-b7af-6962b6ee0db5
+	fromColumn: Sales.'Product SK'
+	toColumn: Product.'Product SK'
+
+relationship e9cf6dca-af7e-5de1-bdee-d1183d6f22fe
+	fromColumn: Sales.'Country Code'
+	toColumn: Country.'Country Code'
+
+relationship 536a27e8-bc71-54a7-8451-b5d56d54ebe3
+	fromColumn: Sales.'Channel Key'
+	toColumn: Channel.'Channel Key'
+
+relationship 43678882-0ab7-5a96-b977-55709c5efa67
+	fromColumn: Target.'Date Key'
+	toColumn: Calendar.'Date Key'
+
+relationship 06160467-6475-57cb-8932-b62c5e07c563
+	fromColumn: Target.'Country Code'
+	toColumn: Country.'Country Code'
+
+relationship 51b020e9-3464-5ed7-8217-3ecc1511e140
+	fromColumn: 'FX Rate'.'Date Key'
+	toColumn: Calendar.'Date Key'
+
+relationship 954f246e-a432-5bd3-91ea-5c9555cc9757
+	fromColumn: 'Data Quality'.'Date Key'
+	toColumn: Calendar.'Date Key'

@@ -1,0 +1,48 @@
+dataContract: erp_order_lines
+version: 1.3.0
+owner: Sales Operations (ERP)
+description: Daily export of booked order lines and returns from the ERP system.
+source:
+  system: ERP
+  format: csv
+  delimiter: ";"
+  encoding: cp1252
+  numberFormat: de-DE        # 1.234,56
+  dateFormat: "%d.%m.%Y"
+  delivery: daily before 06:00 CET
+grain: one row per order line (returns are separate lines 9xx)
+primaryKey: [order_id, line_no]
+onDuplicate: keep_first      # the ERP re-exports lines after edits
+freshness:
+  column: order_date
+  maxAgeDays: 4
+rename:
+  Auftragsnr: order_id
+  Pos: line_no
+  Auftragsdatum: order_date
+  Kundennr: customer_id
+  Artikelnr: sku
+  Menge: quantity
+  Einzelpreis: unit_price_local
+  Rabatt %: discount_pct
+  Währung: currency
+  Lieferland: ship_to_country
+  Vertriebskanal: channel
+  Status: status
+columns:
+  order_id:        {type: string, required: true, pattern: '^A\d{7}$'}
+  line_no:         {type: int, required: true, min: 1}
+  order_date:      {type: date, required: true}
+  customer_id:     {type: string, required: true, pattern: '^C\d{5}$', cleanse: [trim, upper]}
+  sku:             {type: string, required: true, pattern: '^VC-[A-Z]{2}-\d{4}$', cleanse: [trim, upper], references: product.sku}
+  quantity:        {type: int, required: true, notEqual: 0}
+  unit_price_local: {type: decimal, required: true, min: 0}
+  discount_pct:    {type: decimal, required: true, min: 0, max: 60}
+  currency:        {type: string, required: true, cleanse: [trim, upper], allowed: [EUR, CHF, GBP, PLN, SEK, USD, JPY]}
+  ship_to_country: {type: string, required: true, allowed: [DE, CH, FR, IT, GB, PL, SE, US, JP]}
+  channel:         {type: string, required: true, allowed: [Direct, Distributor, E-Procurement]}
+  status:          {type: string, required: true, allowed: [Geliefert, Retoure]}
+rules:
+  - name: return_lines_have_negative_quantity
+    description: Returns (status Retoure) must carry a negative quantity, deliveries a positive one.
+    expr: "(status = 'Retoure') = (quantity < 0)"

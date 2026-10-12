@@ -1,0 +1,26 @@
+dataContract: product_master
+version: 1.1.0
+owner: Product Management (ERP master data)
+description: Article master with category hierarchy, list price and standard cost.
+source: {system: ERP, format: csv, delimiter: ";", encoding: cp1252, numberFormat: de-DE, delivery: full snapshot}
+grain: one row per article
+primaryKey: [sku]
+onDuplicate: keep_last
+rename:
+  Artikelnr: sku
+  Bezeichnung: product_name
+  Warengruppe: category
+  Untergruppe: subcategory
+  Listenpreis EUR: list_price_eur
+  Standardkosten EUR: unit_cost_eur
+columns:
+  sku:            {type: string, required: true, pattern: '^VC-[A-Z]{2}-\d{4}$'}
+  product_name:   {type: string, required: true}
+  category:       {type: string, required: true}
+  subcategory:    {type: string, required: true}
+  list_price_eur: {type: decimal, required: true, min: 0}
+  unit_cost_eur:  {type: decimal, required: true, min: 0}
+rules:
+  - name: cost_below_list_price
+    description: Standard cost must be lower than list price, otherwise margins are wrong.
+    expr: unit_cost_eur < list_price_eur

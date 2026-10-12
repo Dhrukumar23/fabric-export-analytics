@@ -1,0 +1,73 @@
+table Product
+	lineageTag: 81ade3fb-259d-5a22-a161-ed7140bef8c6
+
+	column 'Product SK'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ae37d482-9d30-5900-b734-7f533aca7411
+		summarizeBy: none
+		sourceColumn: product_sk
+
+		annotation SummarizationSetBy = User
+
+	column SKU
+		dataType: string
+		lineageTag: e82ca6a2-ecc3-56bb-9de3-11e205072995
+		summarizeBy: none
+		sourceColumn: sku
+
+		annotation SummarizationSetBy = User
+
+	column Product
+		dataType: string
+		lineageTag: 224f48a2-af7c-52e1-8fd2-5e21a69c85bc
+		summarizeBy: none
+		sourceColumn: product_name
+
+		annotation SummarizationSetBy = User
+
+	column Category
+		dataType: string
+		lineageTag: 758742cc-29ea-5084-9ed2-1dd91d96d254
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = User
+
+	column Subcategory
+		dataType: string
+		lineageTag: 96d4040f-5b49-57be-998e-8c590d9ac443
+		summarizeBy: none
+		sourceColumn: subcategory
+
+		annotation SummarizationSetBy = User
+
+	column 'List Price EUR'
+		dataType: double
+		formatString: "€"#,0
+		lineageTag: 12d85724-42a1-5185-a60c-d3335da1a11e
+		summarizeBy: none
+		sourceColumn: list_price_eur
+
+		annotation SummarizationSetBy = User
+
+	column 'Standard Cost EUR'
+		dataType: double
+		formatString: "€"#,0
+		lineageTag: 5d80dbf8-4570-554f-a959-4086cad2d8aa
+		summarizeBy: none
+		sourceColumn: unit_cost_eur
+
+		annotation SummarizationSetBy = User
+
+	partition Product = m
+		mode: import
+		source =
+				let
+				    Source = fnReadGold("dim_product"),
+				    Typed = Table.TransformColumnTypes(Source, {{"product_sk", Int64.Type}, {"sku", type text}, {"product_name", type text}, {"category", type text}, {"subcategory", type text}, {"list_price_eur", type number}, {"unit_cost_eur", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

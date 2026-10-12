@@ -1,0 +1,52 @@
+{
+  "name": "Valdora",
+  "dataColors": [
+    "#0E6B63",
+    "#2A78D6",
+    "#C98A0B",
+    "#7A4FBF",
+    "#C0392B",
+    "#5FA8A0",
+    "#E87BA4",
+    "#566571"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#13202A",
+  "tableAccent": "#0E6B63",
+  "good": "#0E6B63",
+  "neutral": "#C98A0B",
+  "bad": "#C0392B",
+  "textClasses": {
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 11,
+      "color": "#13202A"
+    },
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 22,
+      "color": "#13202A"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 10,
+      "color": "#566571"
+    }
+  },
+  "visualStyles": {
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#F3F6F7"
+              }
+            },
+            "transparency": 0
+          }
+        ]
+      }
+    }
+  }
+}

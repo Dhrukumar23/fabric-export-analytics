@@ -1,0 +1,69 @@
+/// Sales countries with region and invoicing currency.
+table Country
+	lineageTag: b7756f1a-5455-5ee6-ab5c-5f3396f1ef9c
+
+	column 'Country Code'
+		dataType: string
+		lineageTag: e9136a47-d542-5e06-b4bb-9c19cf2a7154
+		summarizeBy: none
+		sourceColumn: country_code
+
+		annotation SummarizationSetBy = User
+
+	column Country
+		dataType: string
+		dataCategory: Country
+		lineageTag: ee6172ca-0e80-5144-a4db-71c19b69168b
+		summarizeBy: none
+		sourceColumn: country
+		sortByColumn: 'Country Sort'
+
+		annotation SummarizationSetBy = User
+
+	column Region
+		dataType: string
+		lineageTag: 65916f42-27d1-5e9f-a0ac-6599bb73391d
+		summarizeBy: none
+		sourceColumn: region
+
+		annotation SummarizationSetBy = User
+
+	column Currency
+		dataType: string
+		lineageTag: 80d48394-7363-5865-bae9-620e16f15493
+		summarizeBy: none
+		sourceColumn: currency
+
+		annotation SummarizationSetBy = User
+
+	column 'Market Entry'
+		dataType: dateTime
+		formatString: dd.mm.yyyy
+		lineageTag: cab2b48a-3b32-5302-a090-10cd1bfb8037
+		summarizeBy: none
+		sourceColumn: market_entry_date
+
+		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Country Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: bdb8f96c-f742-5bbf-ba97-aef56e494d11
+		summarizeBy: none
+		sourceColumn: country_sort
+
+		annotation SummarizationSetBy = User
+
+	partition Country = m
+		mode: import
+		source =
+				let
+				    Source = fnReadGold("dim_country"),
+				    Typed = Table.TransformColumnTypes(Source, {{"country_code", type text}, {"country", type text}, {"region", type text}, {"currency", type text}, {"market_entry_date", type date}, {"country_sort", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

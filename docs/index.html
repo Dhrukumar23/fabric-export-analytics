@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Valdora Sales Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: report header, one filter row, KPI strip, 2-column chart grid that stacks on phones */
+:root{
+  --bg:#F3F6F7; --card:#FFFFFF; --ink:#13202A; --muted:#566571; --faint:#8A98A3; --line:#DDE4E8; --grid:#E9EEF1;
+  --accent:#0E6B63; --accent-2:#5FA8A0; --target:#13202A;
+  --pos:#2a78d6; --neg:#e34948; --warn:#B26A00;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1419; --card:#141E25; --ink:#E6EDF1; --muted:#97A6B1; --faint:#6B7B86; --line:#25333D; --grid:#1E2A32;
+  --accent:#4DBDB0; --accent-2:#2F7F77; --target:#E6EDF1; --pos:#3987e5; --neg:#e66767; --warn:#EDB540; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1419; --card:#141E25; --ink:#E6EDF1; --muted:#97A6B1; --faint:#6B7B86; --line:#25333D; --grid:#1E2A32;
+  --accent:#4DBDB0; --accent-2:#2F7F77; --target:#E6EDF1; --pos:#3987e5; --neg:#e66767; --warn:#EDB540; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:76rem;margin:0 auto;padding-inline:clamp(16px,3vw,2rem);padding-block:1.6rem 3rem;display:grid;gap:1.2rem}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(1.6rem,3.5vw,2.2rem);margin:0;letter-spacing:-.02em}
+.sub{color:var(--muted);font-size:.92rem}
+.mono{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.04em;color:var(--muted)}
+.filters{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.seg-btn{font:600 .9rem var(--f-body);padding:.4rem .9rem;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-variant-numeric:tabular-nums}
+.seg-btn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:.8rem}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;display:grid;gap:.15rem;min-width:0}
+.kpi .v{font-family:var(--f-display);font-weight:600;font-size:clamp(1.3rem,2.6vw,1.75rem);font-variant-numeric:tabular-nums;white-space:nowrap}
+.kpi .l{color:var(--muted);font-size:.85rem}
+.kpi .d{font-size:.8rem;color:var(--muted)}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem;display:grid;gap:.6rem;min-width:0;position:relative;align-content:start}
+.card.wide{grid-column:1/-1}
+.card h2{font-family:var(--f-body);font-size:1rem;font-weight:700;margin:0}
+.card .note{color:var(--muted);font-size:.85rem;margin:0}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{font-family:var(--f-body);font-size:11px;fill:var(--muted)}
+svg .val{fill:var(--ink);font-weight:600}
+.legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:10px;border-radius:2px;margin-right:.35rem;vertical-align:-1px}
+.legend i.line{height:2px;width:14px;vertical-align:3px;border-radius:0}
+.tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.45rem .6rem;font-size:.82rem;box-shadow:0 8px 24px -12px rgba(0,0,0,.35);white-space:nowrap;z-index:5}
+.tip b{font-variant-numeric:tabular-nums}
+.hit{fill:transparent;cursor:default}
+.hit:focus{outline:none}
+.bar:hover,.hl{opacity:.8}
+footer{color:var(--muted);font-size:.82rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;border-top:1px solid var(--line);padding-top:1rem}
+details{font-size:.85rem}
+summary{cursor:pointer;color:var(--muted)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.85rem;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:.3rem .5rem;border-bottom:1px solid var(--grid)}
+th:first-child,td:first-child{text-align:left}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <span class="mono">VALDORA COMPONENTS GMBH · FICTIONAL COMPANY · AUTOMATED DAILY</span>
+      <h1>Valdora Sales Monitor</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <div class="filters" role="group" aria-label="Year" id="years"></div>
+  </header>
+
+  <section class="kpis" id="kpis" aria-label="Key figures"></section>
+
+  <section class="grid">
+    <article class="card wide">
+      <h2>Net revenue vs target by month</h2>
+      <p class="note">Last 24 months, EUR at ECB daily rates. Target from the controlling budget; the running month is compared pro-rata.</p>
+      <div class="legend"><span><i style="background:var(--accent)"></i>Net revenue</span><span><i class="line" style="background:var(--target)"></i>Target</span></div>
+      <div id="c-month"></div>
+    </article>
+    <article class="card">
+      <h2>Target achievement by country</h2>
+      <p class="note" id="n-country"></p>
+      <div id="c-country"></div>
+    </article>
+    <article class="card">
+      <h2>Gross margin by customer segment</h2>
+      <p class="note">Labels show the average discount granted. Heavier discounts explain the lower margins.</p>
+      <div id="c-seg"></div>
+    </article>
+    <article class="card">
+      <h2>Currency effect vs planning rates</h2>
+      <p class="note">Revenue at actual ECB rates minus revenue at Treasury's planning rates.</p>
+      <div class="legend"><span><i style="background:var(--pos)"></i>Tailwind</span><span><i style="background:var(--neg)"></i>Headwind</span></div>
+      <div id="c-fx"></div>
+    </article>
+    <article class="card">
+      <h2>Data quality: ERP order lines</h2>
+      <p class="note">Rows per day caught by the data contracts over the last 60 loads.</p>
+      <div class="legend"><span><i style="background:var(--neg)"></i>Quarantined</span><span><i style="background:var(--faint)"></i>Auto-fixed or deduplicated</span></div>
+      <div id="c-dq"></div>
+    </article>
+  </section>
+
+  <details>
+    <summary>Show the numbers as a table</summary>
+    <div class="tbl" id="tbl"></div>
+  </details>
+
+  <footer>
+    <span id="foot"></span>
+    <span>Pipeline: Python data contracts → Delta / Parquet star schema → Power BI (PBIP) · built by Dhrukumar Valand</span>
+  </footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const D = {"company":"Valdora Components GmbH (fictional)","last_date":"2026-10-11","built":"2026-10-12 11:54 UTC","years":["2024","2025","2026"],"monthly":[{"m":"2024-11","a":1955157,"t":2065700},{"m":"2024-12","a":1517410,"t":1659000},{"m":"2025-01","a":1826864,"t":1971800},{"m":"2025-02","a":1828383,"t":1818600},{"m":"2025-03","a":1901661,"t":2141900},{"m":"2025-04","a":2047622,"t":2168200},{"m":"2025-05","a":1953391,"t":2187000},{"m":"2025-06","a":2001478,"t":2175500},{"m":"2025-07","a":1916892,"t":2225500},{"m":"2025-08","a":1415087,"t":1621300},{"m":"2025-09","a":2462897,"t":2502100},{"m":"2025-10","a":2521322,"t":2713900},{"m":"2025-11","a":2166938,"t":2348200},{"m":"2025-12","a":1818724,"t":2080700},{"m":"2026-01","a":2165856,"t":2259600},{"m":"2026-02","a":1981820,"t":2196500},{"m":"2026-03","a":2392131,"t":2702100},{"m":"2026-04","a":2564446,"t":2615800},{"m":"2026-05","a":2569616,"t":2508300},{"m":"2026-06","a":2556704,"t":2702000},{"m":"2026-07","a":2512333,"t":2627700},{"m":"2026-08","a":1858345,"t":1903000},{"m":"2026-09","a":2983697,"t":2875000},{"m":"2026-10","a":1025253,"t":2953800}],"per_year":{"2024":{"revenue":22136638.51,"target":23489000.0,"gm_pct":0.3917538995851814,"fx_effect":-161760.81,"orders":6663,"countries":[{"country":"Germany","actual":7197692.46,"target":7899500.0},{"country":"Switzerland","actual":2287018.43,"target":2168800.0},{"country":"France","actual":3088856.9,"target":3513600.0},{"country":"Italy","actual":2469130.1299999994,"target":2748700.0},{"country":"United Kingdom","actual":2622908.28,"target":2647400.0},{"country":"Poland","actual":2313071.05,"target":2515800.0},{"country":"Sweden","actual":2157961.2600000002,"target":1995200.0}],"segments":[{"segment":"Distributor","revenue":5372873.550000001,"gm_pct":0.3575637397980453,"disc_pct":0.19511558822531358},{"segment":"Key Account","revenue":10170562.660000002,"gm_pct":0.37831048867457623,"disc_pct":0.1104701315141215},{"segment":"Industrial OEM","revenue":4849295.619999999,"gm_pct":0.429499938384866,"disc_pct":0.05516259829821018},{"segment":"SME Workshop","revenue":1743906.68,"gm_pct":0.4705337787914202,"disc_pct":0.0203098558379015}],"fx":[{"currency":"CHF","effect":-135184.2},{"currency":"SEK","effect":-60562.27000000001},{"currency":"PLN","effect":6941.090000000015},{"currency":"GBP","effect":27044.57000000001}],"partial":false},"2025":{"revenue":23861259.630000003,"target":25954700.0,"gm_pct":0.3924935215165756,"fx_effect":93583.88999999998,"orders":7290,"countries":[{"country":"Germany","actual":7478205.420000007,"target":8352800.0},{"country":"Switzerland","actual":2031298.8299999991,"target":2105300.0},{"country":"France","actual":3058558.019999999,"target":3275500.0},{"country":"Italy","actual":2400516.709999998,"target":2557300.0},{"country":"United Kingdom","actual":2727836.5699999994,"target":2693200.0},{"country":"Poland","actual":2526884.9599999995,"target":2929800.0},{"country":"Sweden","actual":1979495.83,"target":2385600.0},{"country":"United States","actual":1507933.719999999,"target":1493500.0},{"country":"Japan","actual":150529.56999999998,"target":161700.0}],"segments":[{"segment":"Distributor","revenue":5828465.99,"gm_pct":0.3567145134872788,"disc_pct":0.19478245424588167},{"segment":"Key Account","revenue":11254516.809999997,"gm_pct":0.37944064966037416,"disc_pct":0.10943466806427674},{"segment":"Industrial OEM","revenue":4930399.029999998,"gm_pct":0.4344828718660528,"disc_pct":0.05510395078555187},{"segment":"SME Workshop","revenue":1847877.8000000005,"gm_pct":0.47281065338844375,"disc_pct":0.019722167017541384}],"fx":[{"currency":"SEK","effect":-52213.229999999996},{"currency":"JPY","effect":-6119.81},{"currency":"CHF","effect":7945.749999999998},{"currency":"PLN","effect":15467.309999999994},{"currency":"USD","effect":46966.29},{"currency":"GBP","effect":81537.57999999999}],"partial":false},"2026":{"revenue":22610198.99,"target":23438122.58064516,"gm_pct":0.39336517975510304,"fx_effect":-105692.45999999999,"orders":6908,"countries":[{"country":"Germany","actual":5892252.199999999,"target":6397677.419354838},{"country":"Switzerland","actual":1811839.86,"target":1929261.2903225806},{"country":"France","actual":2641295.64,"target":2691148.3870967743},{"country":"Italy","actual":1797546.2299999997,"target":2043764.5161290322},{"country":"United Kingdom","actual":2000678.73,"target":2118822.580645161},{"country":"Poland","actual":2117237.46,"target":2370145.1612903224},{"country":"Sweden","actual":1578258.0099999998,"target":1709948.3870967743},{"country":"United States","actual":3396953.8599999994,"target":2853832.258064516},{"country":"Japan","actual":1374137.0,"target":1323522.5806451612}],"segments":[{"segment":"Distributor","revenue":5402007.960000001,"gm_pct":0.35865305537239517,"disc_pct":0.1950206243186138},{"segment":"Key Account","revenue":10263880.99,"gm_pct":0.3788100362609524,"disc_pct":0.10990608241895389},{"segment":"Industrial OEM","revenue":5074299.139999998,"gm_pct":0.4320957534245804,"disc_pct":0.055274574350253555},{"segment":"SME Workshop","revenue":1870010.9000000001,"gm_pct":0.4684326118099098,"disc_pct":0.020285994416386458}],"fx":[{"currency":"PLN","effect":-113429.97},{"currency":"JPY","effect":-98091.29},{"currency":"GBP","effect":-37032.29999999999},{"currency":"USD","effect":-10344.30999999999},{"currency":"CHF","effect":75905.12000000001},{"currency":"SEK","effect":77300.29000000001}],"partial":true}},"dq":[{"d":"2026-08-11","q":0,"f":2,"u":0,"n":64},{"d":"2026-08-12","q":0,"f":0,"u":0,"n":73},{"d":"2026-08-13","q":0,"f":3,"u":1,"n":53},{"d":"2026-08-14","q":0,"f":0,"u":0,"n":53},{"d":"2026-08-15","q":0,"f":0,"u":0,"n":15},{"d":"2026-08-16","q":0,"f":0,"u":0,"n":2},{"d":"2026-08-17","q":0,"f":0,"u":1,"n":41},{"d":"2026-08-18","q":0,"f":0,"u":1,"n":66},{"d":"2026-08-19","q":1,"f":1,"u":0,"n":50},{"d":"2026-08-20","q":0,"f":2,"u":0,"n":52},{"d":"2026-08-21","q":1,"f":0,"u":2,"n":72},{"d":"2026-08-22","q":0,"f":0,"u":1,"n":8},{"d":"2026-08-23","q":0,"f":0,"u":0,"n":2},{"d":"2026-08-24","q":0,"f":0,"u":0,"n":70},{"d":"2026-08-25","q":1,"f":1,"u":1,"n":61},{"d":"2026-08-26","q":0,"f":0,"u":0,"n":55},{"d":"2026-08-27","q":0,"f":0,"u":0,"n":55},{"d":"2026-08-28","q":2,"f":2,"u":0,"n":59},{"d":"2026-08-29","q":0,"f":0,"u":0,"n":5},{"d":"2026-08-30","q":0,"f":0,"u":0,"n":2},{"d":"2026-08-31","q":1,"f":4,"u":1,"n":64},{"d":"2026-09-01","q":0,"f":4,"u":1,"n":104},{"d":"2026-09-02","q":0,"f":1,"u":1,"n":80},{"d":"2026-09-03","q":0,"f":1,"u":1,"n":122},{"d":"2026-09-04","q":0,"f":2,"u":1,"n":89},{"d":"2026-09-05","q":1,"f":0,"u":0,"n":14},{"d":"2026-09-07","q":0,"f":1,"u":2,"n":90},{"d":"2026-09-08","q":0,"f":0,"u":1,"n":111},{"d":"2026-09-09","q":1,"f":1,"u":1,"n":72},{"d":"2026-09-10","q":0,"f":2,"u":0,"n":86},{"d":"2026-09-11","q":0,"f":1,"u":0,"n":88},{"d":"2026-09-12","q":0,"f":0,"u":0,"n":28},{"d":"2026-09-13","q":0,"f":0,"u":0,"n":1},{"d":"2026-09-14","q":0,"f":0,"u":0,"n":102},{"d":"2026-09-15","q":1,"f":2,"u":2,"n":84},{"d":"2026-09-16","q":1,"f":0,"u":0,"n":91},{"d":"2026-09-17","q":0,"f":2,"u":1,"n":59},{"d":"2026-09-18","q":1,"f":0,"u":1,"n":82},{"d":"2026-09-19","q":0,"f":0,"u":0,"n":16},{"d":"2026-09-21","q":0,"f":1,"u":0,"n":77},{"d":"2026-09-22","q":0,"f":0,"u":1,"n":78},{"d":"2026-09-23","q":0,"f":1,"u":1,"n":80},{"d":"2026-09-24","q":1,"f":2,"u":3,"n":88},{"d":"2026-09-25","q":2,"f":0,"u":1,"n":97},{"d":"2026-09-26","q":0,"f":0,"u":0,"n":24},{"d":"2026-09-27","q":0,"f":0,"u":0,"n":3},{"d":"2026-09-28","q":1,"f":3,"u":0,"n":84},{"d":"2026-09-29","q":1,"f":0,"u":0,"n":75},{"d":"2026-09-30","q":0,"f":2,"u":0,"n":66},{"d":"2026-10-01","q":0,"f":0,"u":2,"n":102},{"d":"2026-10-02","q":2,"f":0,"u":0,"n":90},{"d":"2026-10-03","q":0,"f":0,"u":0,"n":19},{"d":"2026-10-04","q":0,"f":0,"u":0,"n":2},{"d":"2026-10-05","q":0,"f":1,"u":1,"n":129},{"d":"2026-10-06","q":0,"f":3,"u":0,"n":101},{"d":"2026-10-07","q":0,"f":1,"u":0,"n":99},{"d":"2026-10-08","q":0,"f":0,"u":0,"n":83},{"d":"2026-10-09","q":1,"f":2,"u":1,"n":96},{"d":"2026-10-10","q":0,"f":0,"u":0,"n":12},{"d":"2026-10-11","q":0,"f":0,"u":0,"n":4}],"fact_rows":46856,"fx_source":"Synthetic fallback (ECB offline)"};
+const NS = "http://www.w3.org/2000/svg";
+const tip = document.getElementById("tip");
+const eur = v => { const a = Math.abs(v); const s = v < 0 ? "−" : "";
+  return a >= 1e6 ? s + "€" + (a/1e6).toFixed(2) + "M" : s + "€" + Math.round(a/1e3).toLocaleString("en") + "k"; };
+const pct = (v, d=1) => (v*100).toFixed(d) + "%";
+
+function el(tag, attrs, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function txt(parent, x, y, s, attrs={}){ const t = el("text", Object.assign({x, y}, attrs), parent); t.textContent = s; return t; }
+function svgBox(container, w, h){ container.textContent = ""; return el("svg", {viewBox:`0 0 ${w} ${h}`, role:"img"}, container); }
+function showTip(evt, rows){
+  tip.textContent = "";
+  rows.forEach(([label, value], i) => { const d = document.createElement("div"); const b = document.createElement("b"); b.textContent = value;
+    d.appendChild(b); d.appendChild(document.createTextNode("  " + label)); if (i === 0) d.style.marginBottom = ".1rem"; tip.appendChild(d); });
+  tip.hidden = false;
+  const r = evt.target.getBoundingClientRect ? evt.target.getBoundingClientRect() : {left: evt.clientX, top: evt.clientY, width: 0};
+  const x = (evt.clientX ?? (r.left + r.width/2)) + window.scrollX + 12, y = (evt.clientY ?? r.top) + window.scrollY - 10;
+  tip.style.left = Math.min(x, window.scrollX + document.documentElement.clientWidth - tip.offsetWidth - 12) + "px";
+  tip.style.top = (y - tip.offsetHeight) + "px";
+}
+function hideTip(){ tip.hidden = true; }
+function bindTip(node, rows){ node.setAttribute("tabindex", "0");
+  node.addEventListener("pointermove", e => showTip(e, rows)); node.addEventListener("pointerleave", hideTip);
+  node.addEventListener("focus", e => { const r = node.getBoundingClientRect(); showTip({clientX: r.left + r.width/2, clientY: r.top, target: node}, rows); });
+  node.addEventListener("blur", hideTip); }
+function niceMax(v){ const p = Math.pow(10, Math.floor(Math.log10(v))); for (const m of [1,1.5,2,2.5,3,4,5,6,8,10]) if (m*p >= v) return m*p; return 10*p; }
+
+// ------------------------------------------------------------------ monthly
+function monthly(){
+  const c = document.getElementById("c-month"), W = 760, H = 250, L = 52, R = 8, T = 10, B = 26;
+  const s = svgBox(c, W, H), data = D.monthly.map(d => Object.assign({}, d));
+  const lastD = new Date(D.last_date + "T00:00:00"), lastM = D.last_date.slice(0, 7);
+  const dim = new Date(lastD.getFullYear(), lastD.getMonth() + 1, 0).getDate();
+  data.forEach(d => { if (d.m === lastM && lastD.getDate() < dim) { d.t = Math.round(d.t * lastD.getDate() / dim); d.m += " MTD"; } });
+  s.setAttribute("aria-label", "Monthly net revenue against target, last 24 months");
+  const max = niceMax(Math.max(...data.map(d => Math.max(d.a, d.t))));
+  const y = v => T + (H - T - B) * (1 - v / max), step = (W - L - R) / data.length, bw = Math.max(4, step - 4);
+  for (let i = 0; i <= 4; i++){ const v = max * i / 4; el("line", {x1:L, x2:W-R, y1:y(v), y2:y(v), stroke:"var(--grid)"}, s); txt(s, L-8, y(v)+4, eur(v), {"text-anchor":"end"}); }
+  let path = "";
+  data.forEach((d, i) => {
+    const x = L + i*step + (step - bw)/2;
+    const h = Math.max(0, y(0) - y(d.a));
+    el("path", {class:"bar", d:`M${x},${y(0)} v${-Math.max(0,h-3)} q0,-3 3,-3 h${bw-6} q3,0 3,3 v${Math.max(0,h-3)} z`, fill:"var(--accent)"}, s);
+    if (d.t > 0){ const cx = x + bw/2; path += (path && data[i-1] && data[i-1].t > 0 ? "L" : "M") + cx + "," + y(d.t); }
+    if (i % 3 === 0 || i === data.length - 1) txt(s, x + bw/2, H - 8, d.m, {"text-anchor":"middle"});
+    const hit = el("rect", {class:"hit", x:L + i*step, y:T, width:step, height:H-T-B}, s);
+    bindTip(hit, [[d.m, ""], ["net revenue", eur(d.a)], ["target", d.t ? eur(d.t) : "–"], ["achievement", d.t ? pct(d.a/d.t, 0) : "–"]]);
+  });
+  el("path", {d:path, fill:"none", stroke:"var(--target)", "stroke-width":2, "stroke-dasharray":"5 4"}, s);
+  el("line", {x1:L, x2:W-R, y1:y(0), y2:y(0), stroke:"var(--faint)"}, s);
+}
+
+// ------------------------------------------------------------------ horizontal bars (generic)
+function hbars(id, rows, {value, max, ref, label, fmt, color, aria, tipRows, R = 58}){
+  const c = document.getElementById(id), W = 380, rowH = 26, L = 112, T = 6;
+  const H = T + rows.length * rowH + 22, s = svgBox(c, W, H);
+  s.setAttribute("aria-label", aria);
+  const x = v => L + (W - L - R) * v / max;
+  [0, max/2, max].forEach(v => { el("line", {x1:x(v), x2:x(v), y1:T, y2:H-20, stroke:"var(--grid)"}, s); txt(s, x(v), H-6, fmt(v), {"text-anchor":"middle"}); });
+  rows.forEach((r, i) => {
+    const yy = T + i*rowH, v = value(r), w = Math.max(2, x(v) - L);
+    txt(s, L - 8, yy + 16, label(r), {"text-anchor":"end", style:"fill:var(--ink)"});
+    el("path", {class:"bar", d:`M${L},${yy+5} h${w-3} q3,0 3,3 v${rowH-16} q0,3 -3,3 h${-(w-3)} z`, fill: color ? color(r) : "var(--accent)"}, s);
+    txt(s, x(max) + 44, yy + 16, fmt(v), {class:"val", "text-anchor":"end"});
+    const hit = el("rect", {class:"hit", x:0, y:yy, width:W, height:rowH}, s);
+    bindTip(hit, tipRows(r));
+  });
+  if (ref != null){ el("line", {x1:x(ref), x2:x(ref), y1:T-2, y2:H-20, stroke:"var(--target)", "stroke-width":2, "stroke-dasharray":"4 3"}, s); }
+}
+
+function country(y){
+  const Y = D.per_year[y];
+  const rows = Y.countries.map(r => Object.assign({ach: r.actual / r.target}, r)).sort((a,b) => a.ach - b.ach);
+  document.getElementById("n-country").textContent = (Y.partial ? "Year to date, target pro-rata to " + D.last_date + ". " : "Full year. ") + "Dashed line = 100% of target.";
+  const max = Math.max(1.2, Math.ceil(Math.max(...rows.map(r => r.ach)) * 10) / 10);
+  hbars("c-country", rows, {value: r => r.ach, max, ref: 1, label: r => r.country, fmt: v => pct(v, 0),
+    color: r => r.ach >= 1 ? "var(--accent)" : "var(--accent-2)", aria: "Target achievement by country",
+    tipRows: r => [[r.country, ""], ["achievement", pct(r.ach)], ["net revenue", eur(r.actual)], ["target", eur(r.target)]]});
+}
+
+function segments(y){
+  const rows = D.per_year[y].segments.filter(r => r.segment !== "Unknown");
+  hbars("c-seg", rows, {R: 110, value: r => r.gm_pct, max: 0.6, label: r => r.segment, fmt: v => pct(v, 0),
+    aria: "Gross margin by customer segment",
+    tipRows: r => [[r.segment, ""], ["gross margin", pct(r.gm_pct)], ["avg discount", pct(r.disc_pct)], ["net revenue", eur(r.revenue)]]});
+  // discount annotations
+  const s = document.querySelector("#c-seg svg");
+  rows.forEach((r, i) => txt(s, 380 - 2, 6 + i*26 + 16, "discount " + pct(r.disc_pct, 0), {"text-anchor":"end"}));
+}
+
+function fx(y){
+  const rows = D.per_year[y].fx, c = document.getElementById("c-fx"), W = 380, rowH = 26, T = 6, L = 50, R = 10;
+  const H = T + rows.length * rowH + 22, s = svgBox(c, W, H);
+  s.setAttribute("aria-label", "Currency effect by currency");
+  const m = niceMax(Math.max(1, ...rows.map(r => Math.abs(r.effect)))), x = v => L + (W - L - R) * (v + m) / (2*m), z = x(0);
+  [-m, 0, m].forEach(v => { el("line", {x1:x(v), x2:x(v), y1:T, y2:H-20, stroke: v === 0 ? "var(--faint)" : "var(--grid)"}, s); txt(s, x(v), H-6, eur(v), {"text-anchor":"middle"}); });
+  rows.forEach((r, i) => {
+    const yy = T + i*rowH, xv = x(r.effect), pos = r.effect >= 0, w = Math.max(2, Math.abs(xv - z));
+    txt(s, L - 8, yy + 16, r.currency, {"text-anchor":"end", style:"fill:var(--ink)"});
+    el("rect", {class:"bar", x: pos ? z : z - w, y: yy + 5, width: w, height: rowH - 10, rx: 3, fill: pos ? "var(--pos)" : "var(--neg)"}, s);
+    txt(s, pos ? z + w + 5 : z - w - 5, yy + 16, eur(r.effect), {class:"val", "text-anchor": pos ? "start" : "end"});
+    bindTip(el("rect", {class:"hit", x:0, y:yy, width:W, height:rowH}, s), [[r.currency, ""], ["effect vs plan rate", eur(r.effect)]]);
+  });
+}
+
+function dq(){
+  const c = document.getElementById("c-dq"), W = 380, H = 170, L = 30, R = 6, T = 8, B = 22, data = D.dq, s = svgBox(c, W, H);
+  s.setAttribute("aria-label", "Rows caught by data contracts per day");
+  const max = niceMax(Math.max(2, ...data.map(d => d.q + d.f + d.u))), y = v => T + (H - T - B) * (1 - v / max);
+  const step = (W - L - R) / data.length, bw = Math.max(2, step - 2);
+  [0, max/2, max].forEach(v => { el("line", {x1:L, x2:W-R, y1:y(v), y2:y(v), stroke:"var(--grid)"}, s); txt(s, L-6, y(v)+4, String(v), {"text-anchor":"end"}); });
+  data.forEach((d, i) => {
+    const x = L + i*step;
+    if (d.q) el("rect", {x, y:y(d.q), width:bw, height:y(0)-y(d.q), fill:"var(--neg)"}, s);
+    if (d.f + d.u) el("rect", {x, y:y(d.q + d.f + d.u), width:bw, height:Math.max(0, y(d.q) - y(d.q + d.f + d.u) - 1), fill:"var(--faint)"}, s);
+    bindTip(el("rect", {class:"hit", x, y:T, width:step, height:H-T-B}, s),
+      [[d.d, ""], ["quarantined", String(d.q)], ["auto-fixed", String(d.f)], ["duplicates removed", String(d.u)], ["rows checked", String(d.n)]]);
+  });
+  txt(s, L, H-6, data[0].d); txt(s, W-R, H-6, data[data.length-1].d, {"text-anchor":"end"});
+}
+
+function kpis(y){
+  const Y = D.per_year[y], prev = D.per_year[String(+y - 1)], box = document.getElementById("kpis");
+  const items = [
+    [eur(Y.revenue), "Net revenue" + (Y.partial ? " YTD" : ""), prev ? "vs " + eur(prev.revenue) + " in " + (+y-1) + (Y.partial ? " (full year)" : "") : ""],
+    [pct(Y.revenue / Y.target), "Target achievement", "target " + eur(Y.target)],
+    [pct(Y.gm_pct), "Gross margin", "after standard cost"],
+    [eur(Y.fx_effect), "Currency effect", "vs planning rates"],
+    [Y.orders.toLocaleString("en"), "Orders", "unique order numbers"],
+  ];
+  box.textContent = "";
+  items.forEach(([v, l, d]) => { const k = document.createElement("div"); k.className = "kpi";
+    [["l", l], ["v", v], ["d", d]].forEach(([cls, t]) => { const e = document.createElement("div"); e.className = cls; e.textContent = t; k.appendChild(e); });
+    box.appendChild(k); });
+}
+
+function table(y){
+  const Y = D.per_year[y], t = document.createElement("table"), head = ["Country", "Net revenue", "Target", "Achievement"];
+  const tr = t.insertRow(); head.forEach(h => { const th = document.createElement("th"); th.textContent = h; tr.appendChild(th); });
+  Y.countries.forEach(r => { const row = t.insertRow(); [r.country, eur(r.actual), eur(r.target), pct(r.actual / r.target)].forEach(v => { row.insertCell().textContent = v; }); });
+  const box = document.getElementById("tbl"); box.textContent = ""; box.appendChild(t);
+}
+
+function render(y){
+  document.querySelectorAll("#years button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.y === y)));
+  kpis(y); country(y); segments(y); fx(y); table(y);
+}
+
+document.getElementById("sub").textContent = "Data through " + D.last_date + " · " + D.fact_rows.toLocaleString("en") + " order lines · FX: " + D.fx_source;
+document.getElementById("foot").textContent = "Last automatic build: " + D.built;
+const yb = document.getElementById("years");
+D.years.forEach(y => { const b = document.createElement("button"); b.className = "seg-btn"; b.dataset.y = y; b.textContent = y;
+  b.addEventListener("click", () => render(y)); yb.appendChild(b); });
+monthly(); dq(); render(D.years[D.years.length - 1]);
+</script>
+</body>
+</html>

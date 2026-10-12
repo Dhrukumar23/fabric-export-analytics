@@ -1,0 +1,17 @@
+dataContract: crm_customers
+version: 2.0.0
+owner: Sales Excellence (CRM)
+description: Change feed of customer accounts from the CRM REST API (/v2/customers/changes).
+source: {system: CRM, format: json, path: "data[*]", delivery: daily delta}
+grain: one row per customer change
+primaryKey: [customer_id, updated_at]
+onDuplicate: keep_last
+columns:
+  customer_id:   {type: string, required: true, pattern: '^C\d{5}$'}
+  customer_name: {type: string, required: true}
+  country_code:  {type: string, required: true, allowed: [DE, CH, FR, IT, GB, PL, SE, US, JP]}
+  segment:       {type: string, required: true, allowed: [Key Account, Industrial OEM, Distributor, SME Workshop]}
+  is_key_account: {type: bool, required: true}
+  sales_rep:     {type: string, required: true}
+  created_at:    {type: date, required: true}
+  updated_at:    {type: date, required: true}

@@ -1,0 +1,57 @@
+/// Calculation group: apply any measure as MTD, QTD, YTD, PY, YoY, YoY % or rolling 12 months.
+table 'Time Calculation'
+	lineageTag: 90f479c0-846e-59ef-8c3c-9c48bd9f275d
+
+	calculationGroup
+		precedence: 10
+
+		calculationItem Current = SELECTEDMEASURE ()
+			ordinal: 0
+
+		calculationItem MTD = CALCULATE ( SELECTEDMEASURE (), DATESMTD ( 'Calendar'[Date] ) )
+			ordinal: 1
+
+		calculationItem QTD = CALCULATE ( SELECTEDMEASURE (), DATESQTD ( 'Calendar'[Date] ) )
+			ordinal: 2
+
+		calculationItem YTD = CALCULATE ( SELECTEDMEASURE (), DATESYTD ( 'Calendar'[Date] ) )
+			ordinal: 3
+
+		calculationItem PY = CALCULATE ( SELECTEDMEASURE (), SAMEPERIODLASTYEAR ( 'Calendar'[Date] ) )
+			ordinal: 4
+
+		calculationItem YoY =
+				VAR _cy = SELECTEDMEASURE ()
+				VAR _py = CALCULATE ( SELECTEDMEASURE (), SAMEPERIODLASTYEAR ( 'Calendar'[Date] ) )
+				RETURN IF ( NOT ISBLANK ( _cy ) && NOT ISBLANK ( _py ), _cy - _py )
+			ordinal: 5
+
+		calculationItem 'YoY %' =
+				VAR _cy = SELECTEDMEASURE ()
+				VAR _py = CALCULATE ( SELECTEDMEASURE (), SAMEPERIODLASTYEAR ( 'Calendar'[Date] ) )
+				RETURN IF ( NOT ISBLANK ( _cy ) && NOT ISBLANK ( _py ), DIVIDE ( _cy - _py, ABS ( _py ) ) )
+			ordinal: 6
+
+			formatStringDefinition = "0.0%"
+
+		calculationItem 'Rolling 12M' = CALCULATE ( SELECTEDMEASURE (), DATESINPERIOD ( 'Calendar'[Date], MAX ( 'Calendar'[Date] ), -12, MONTH ) )
+			ordinal: 7
+
+	column 'Time Calculation'
+		dataType: string
+		lineageTag: 0a039056-838e-5a7a-af0c-092428cab627
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = User
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7ca0ef55-ebe9-51b2-b41d-ad3e59529d2a
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = User

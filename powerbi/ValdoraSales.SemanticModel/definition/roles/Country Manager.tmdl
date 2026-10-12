@@ -1,0 +1,13 @@
+/// Dynamic RLS: each country manager sees only the countries mapped to their e-mail in the Security table.
+role 'Country Manager'
+	modelPermission: read
+
+	tablePermission Country =
+			'Country'[Country Code]
+			    IN CALCULATETABLE (
+			        VALUES ( 'Security'[Country Code] ),
+			        'Security'[User Principal] = USERPRINCIPALNAME ()
+			    )
+
+	annotation PBI_Id = 8226ceaeb83e5513bcf88373d60372c3
+

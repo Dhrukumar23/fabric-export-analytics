@@ -1,0 +1,8 @@
+/// Static RLS example: DACH team sees Germany and Switzerland.
+role 'DACH Sales'
+	modelPermission: read
+
+	tablePermission Country = 'Country'[Region] = "DACH"
+
+	annotation PBI_Id = c7077977c5195e98864394b98190902c
+

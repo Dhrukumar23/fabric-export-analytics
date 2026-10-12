@@ -1,0 +1,13 @@
+dataContract: fx_rates
+version: 1.0.0
+owner: Treasury (source ECB)
+description: ECB euro reference rates, units of foreign currency per 1 EUR, TARGET business days.
+source: {system: ECB Data Portal SDMX API, format: csv, delivery: daily ~16:00 CET}
+grain: one row per currency and business day
+primaryKey: [currency, rate_date]
+onDuplicate: keep_last
+freshness: {column: rate_date, maxAgeDays: 5}
+columns:
+  currency:     {type: string, required: true, allowed: [CHF, GBP, PLN, SEK, USD, JPY]}
+  rate_date:    {type: date, required: true}
+  rate_per_eur: {type: decimal, required: true, min: 0}

@@ -1,0 +1,55 @@
+/// Monthly revenue budget per country (controlling), unpivoted from the wide Excel layout.
+table Target
+	lineageTag: 1ccc36f9-c906-56f6-8669-8ccaebf3ab81
+
+	column 'Country Code'
+		dataType: string
+		isHidden
+		lineageTag: 8f7a9390-9567-52ee-ad38-20422d2afe2c
+		summarizeBy: none
+		sourceColumn: country_code
+
+		annotation SummarizationSetBy = User
+
+	column 'Month Start'
+		dataType: dateTime
+		isHidden
+		formatString: mmm yyyy
+		lineageTag: b4b03143-a651-5b8c-b039-f35c8c32ec10
+		summarizeBy: none
+		sourceColumn: month_start
+
+		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 88dd7509-1ecb-5412-b634-07c10a0550e8
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = User
+
+	column 'Target EUR'
+		dataType: double
+		isHidden
+		formatString: "€"#,0
+		lineageTag: e1177a37-c1f4-5c60-ba90-faa3939a1222
+		summarizeBy: none
+		sourceColumn: target_eur
+
+		annotation SummarizationSetBy = User
+
+	partition Target = m
+		mode: import
+		source =
+				let
+				    Source = fnReadGold("fact_target"),
+				    Typed = Table.TransformColumnTypes(Source, {{"country_code", type text}, {"month_start", type date}, {"date_key", Int64.Type}, {"target_eur", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

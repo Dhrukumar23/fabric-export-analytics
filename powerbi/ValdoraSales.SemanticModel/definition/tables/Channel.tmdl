@@ -1,0 +1,31 @@
+table Channel
+	lineageTag: ab1b6116-d63d-54e2-8bdd-6acd89d8f24e
+
+	column 'Channel Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: cb440bde-e097-56e5-98df-a112d314df04
+		summarizeBy: none
+		sourceColumn: channel_key
+
+		annotation SummarizationSetBy = User
+
+	column Channel
+		dataType: string
+		lineageTag: 197c9038-fe39-52b1-a8c8-a74a7394aa92
+		summarizeBy: none
+		sourceColumn: channel
+
+		annotation SummarizationSetBy = User
+
+	partition Channel = m
+		mode: import
+		source =
+				let
+				    Source = fnReadGold("dim_channel"),
+				    Typed = Table.TransformColumnTypes(Source, {{"channel_key", Int64.Type}, {"channel", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

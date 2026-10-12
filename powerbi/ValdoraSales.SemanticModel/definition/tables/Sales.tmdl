@@ -1,0 +1,474 @@
+/// Order lines and returns at line grain. All measures live here, grouped in display folders.
+table Sales
+	lineageTag: 3464c205-4932-5545-8d20-97453ebb03b2
+
+	/// Invoiced revenue after discounts and returns, converted to EUR at the ECB rate of the order date.
+	measure 'Net Revenue' = SUM ( Sales[Net EUR] )
+		formatString: "€"#,0
+		displayFolder: 1 Revenue
+		lineageTag: 474d4aef-21ba-5bcd-8a5f-f9707b643153
+
+	measure 'Gross Revenue' = SUM ( Sales[Gross EUR] )
+		formatString: "€"#,0
+		displayFolder: 1 Revenue
+		lineageTag: 1af09b33-35b8-5cd6-97b2-6f7c73df9941
+
+	measure 'Discount Amount' = SUM ( Sales[Discount EUR] )
+		formatString: "€"#,0
+		displayFolder: 1 Revenue
+		lineageTag: f4feb0bb-9aad-5d96-a1d1-a5bb8fa2f8ca
+
+	measure 'Discount %' = DIVIDE ( [Discount Amount], [Gross Revenue] )
+		formatString: 0.0%
+		displayFolder: 1 Revenue
+		lineageTag: 37a2f78e-a9d3-56da-8b5a-45a1c3eb0ae8
+
+	measure Returns = -CALCULATE ( [Net Revenue], Sales[Is Return] = TRUE () )
+		formatString: "€"#,0
+		displayFolder: 1 Revenue
+		lineageTag: 913aed86-19cf-531e-832c-9c11a9d842a8
+
+	measure 'Return Rate' = DIVIDE ( [Returns], CALCULATE ( [Net Revenue], Sales[Is Return] = FALSE () ) )
+		formatString: 0.0%
+		displayFolder: 1 Revenue
+		lineageTag: 2f200f7c-27d8-556e-985b-53a111e86e63
+
+	measure Orders = CALCULATE ( DISTINCTCOUNT ( Sales[Order ID] ), Sales[Is Return] = FALSE () )
+		formatString: #,0
+		displayFolder: 1 Revenue
+		lineageTag: 8f008224-1cde-589c-a754-f74674fe03d5
+
+	measure 'Avg Order Value' = DIVIDE ( CALCULATE ( [Net Revenue], Sales[Is Return] = FALSE () ), [Orders] )
+		formatString: "€"#,0
+		displayFolder: 1 Revenue
+		lineageTag: a95ebc11-044d-558b-8884-3089f8f4c809
+
+	measure Units = SUM ( Sales[Quantity] )
+		formatString: #,0
+		displayFolder: 1 Revenue
+		lineageTag: 4270ab66-240b-51f3-a941-0f4c0cc8771c
+
+	/// Quantity x standard cost.
+	measure COGS = SUM ( Sales[Cost EUR] )
+		formatString: "€"#,0
+		displayFolder: 2 Margin
+		lineageTag: dbeb8813-c0b0-580d-bae2-638d6c13010e
+
+	measure 'Gross Margin' = [Net Revenue] - [COGS]
+		formatString: "€"#,0
+		displayFolder: 2 Margin
+		lineageTag: e20760fe-3637-5677-8629-398cc8410074
+
+	measure 'Gross Margin %' = DIVIDE ( [Gross Margin], [Net Revenue] )
+		formatString: 0.0%
+		displayFolder: 2 Margin
+		lineageTag: fa5382ab-0ef9-59fa-ad2f-1a2829f0c02f
+
+	measure 'Gross Margin % PY' = CALCULATE ( [Gross Margin %], SAMEPERIODLASTYEAR ( 'Calendar'[Date] ) )
+		formatString: 0.0%
+		displayFolder: 2 Margin
+		lineageTag: 4bbf2404-84e0-5052-bc00-52355df295b1
+
+	measure 'Gross Margin % Δ pp' = IF ( NOT ISBLANK ( [Gross Margin % PY] ), ( [Gross Margin %] - [Gross Margin % PY] ) * 100 )
+		formatString: +0.0" pp";-0.0" pp";0.0" pp"
+		displayFolder: 2 Margin
+		lineageTag: 0c237d0a-00cc-5b0a-882d-629b2d22e28b
+
+	/// Controlling budget, phased to the selected days by working days.
+	measure Target =
+			-- Monthly budget phased to the selected days by working days, so any date range compares fairly
+			SUMX (
+			    VALUES ( 'Calendar'[Year Month No] ),
+			    VAR _monthTarget =
+			        CALCULATE ( SUM ( Target[Target EUR] ), ALLEXCEPT ( 'Calendar', 'Calendar'[Year Month No] ) )
+			    VAR _monthWorkdays =
+			        CALCULATE ( COUNTROWS ( 'Calendar' ), ALLEXCEPT ( 'Calendar', 'Calendar'[Year Month No] ), 'Calendar'[Is Working Day] = TRUE () )
+			    VAR _selectedWorkdays =
+			        CALCULATE ( COUNTROWS ( 'Calendar' ), 'Calendar'[Is Working Day] = TRUE () )
+			    RETURN
+			        DIVIDE ( _monthTarget * _selectedWorkdays, _monthWorkdays )
+			)
+		formatString: "€"#,0
+		displayFolder: 3 Target
+		lineageTag: 1a9562cc-5541-5433-b12b-422ed8418657
+
+	/// Target for the days that already have actuals. Use this for achievement in a running period.
+	measure 'Target to Date' = CALCULATE ( [Target], KEEPFILTERS ( 'Calendar'[Has Actuals] = TRUE () ) )
+		formatString: "€"#,0
+		displayFolder: 3 Target
+		lineageTag: 2ffbdbfc-bc34-5314-b78d-76e940227910
+
+	measure 'Variance to Target' = [Net Revenue] - [Target to Date]
+		formatString: "€"#,0
+		displayFolder: 3 Target
+		lineageTag: 011d6480-0303-5cee-badf-8361185993f2
+
+	measure 'Target Achievement %' = DIVIDE ( [Net Revenue], [Target to Date] )
+		formatString: 0.0%
+		displayFolder: 3 Target
+		lineageTag: 6cab185c-d219-5dbe-b2b8-89e19c021f84
+
+	measure 'Full Year Forecast' =
+			-- Actuals so far + remaining budget, scaled by the achievement rate reached so far
+			VAR _year = MAX ( 'Calendar'[Year] )
+			VAR _actual = CALCULATE ( [Net Revenue], REMOVEFILTERS ( 'Calendar' ), 'Calendar'[Year] = _year )
+			VAR _targetToDate = CALCULATE ( [Target to Date], REMOVEFILTERS ( 'Calendar' ), 'Calendar'[Year] = _year )
+			VAR _targetRest =
+			    CALCULATE ( [Target], REMOVEFILTERS ( 'Calendar' ), 'Calendar'[Year] = _year, 'Calendar'[Has Actuals] = FALSE () )
+			RETURN
+			    _actual + _targetRest * DIVIDE ( _actual, _targetToDate, 1 )
+		formatString: "€"#,0
+		displayFolder: 3 Target
+		lineageTag: 6ea07631-d5d2-5877-afe7-4f7fba7b520f
+
+	measure 'Full Year Target' =
+			VAR _year = MAX ( 'Calendar'[Year] )
+			RETURN CALCULATE ( [Target], REMOVEFILTERS ( 'Calendar' ), 'Calendar'[Year] = _year )
+		formatString: "€"#,0
+		displayFolder: 3 Target
+		lineageTag: 87d71304-ea11-5a38-bbfa-4aaebcda7141
+
+	measure 'Forecast vs Full Year Target %' = DIVIDE ( [Full Year Forecast], [Full Year Target] )
+		formatString: 0.0%
+		displayFolder: 3 Target
+		lineageTag: 51d5e653-0b04-5250-b0ab-01aeec62a18f
+
+	/// Same invoices converted at Treasury's planning rate of the year.
+	measure 'Net Revenue at Plan FX' = SUM ( Sales[Net EUR at Plan FX] )
+		formatString: "€"#,0
+		displayFolder: 4 Currency
+		lineageTag: 8b77a7a7-ffe2-591b-977d-c3e053739433
+
+	/// Positive = foreign currencies were stronger than planned (tailwind).
+	measure 'FX Effect' = [Net Revenue] - [Net Revenue at Plan FX]
+		formatString: "€"#,0
+		displayFolder: 4 Currency
+		lineageTag: a6d2704a-5739-59fb-a7a7-184ec00a7a28
+
+	measure 'FX Effect %' = DIVIDE ( [FX Effect], [Net Revenue at Plan FX] )
+		formatString: 0.0%
+		displayFolder: 4 Currency
+		lineageTag: 61d2de11-d538-5b66-b172-3e840666f4f4
+
+	measure 'Revenue Share Foreign Currency' = DIVIDE ( CALCULATE ( [Net Revenue], Sales[Invoice Currency] <> "EUR" ), [Net Revenue] )
+		formatString: 0.0%
+		displayFolder: 4 Currency
+		lineageTag: 2a8437f2-5522-5ee9-a108-ffacbd0a2b9f
+
+	/// Distinct business customers (not SCD versions) with revenue in the period.
+	measure 'Active Customers' = CALCULATE ( DISTINCTCOUNT ( Customer[Customer ID] ), Sales )
+		formatString: #,0
+		displayFolder: 5 Customers
+		lineageTag: 7b871703-9481-548d-a672-6621535a019c
+
+	measure 'New Customers' =
+			VAR _start = MIN ( 'Calendar'[Date] )
+			VAR _customers = CALCULATETABLE ( VALUES ( Customer[Customer ID] ), Sales )
+			RETURN
+			    COUNTROWS (
+			        FILTER (
+			            _customers,
+			            VAR _id = Customer[Customer ID]
+			            VAR _firstOrder =
+			                CALCULATE ( MIN ( Sales[Order Date] ), REMOVEFILTERS ( 'Calendar' ), REMOVEFILTERS ( Customer ), Customer[Customer ID] = _id )
+			            RETURN _firstOrder >= _start
+			        )
+			    ) + 0
+		formatString: #,0
+		displayFolder: 5 Customers
+		lineageTag: 13929327-1613-5080-9b3b-ab81dd956ea7
+
+	/// Customers who ordered in the 12 months before the last 90 days but not since. Ignores the date slicer.
+	measure 'Customers at Risk' =
+			-- bought in the 12 months before the last 90 days, but not in the last 90 days
+			VAR _ref = CALCULATE ( MAX ( Sales[Order Date] ), REMOVEFILTERS ( 'Calendar' ) )
+			VAR _before = CALCULATETABLE ( VALUES ( Customer[Customer ID] ), REMOVEFILTERS ( 'Calendar' ),
+			    DATESBETWEEN ( 'Calendar'[Date], _ref - 455, _ref - 90 ), Sales )
+			VAR _recent = CALCULATETABLE ( VALUES ( Customer[Customer ID] ), REMOVEFILTERS ( 'Calendar' ),
+			    DATESBETWEEN ( 'Calendar'[Date], _ref - 89, _ref ), Sales )
+			RETURN COUNTROWS ( EXCEPT ( _before, _recent ) ) + 0
+		formatString: #,0
+		displayFolder: 5 Customers
+		lineageTag: 760781a0-1d0a-537f-87e4-f01d00bc2c50
+
+	/// Revenue of the customers at risk in their last active 12 months.
+	measure 'Revenue at Risk' =
+			VAR _ref = CALCULATE ( MAX ( Sales[Order Date] ), REMOVEFILTERS ( 'Calendar' ) )
+			VAR _before = CALCULATETABLE ( VALUES ( Customer[Customer ID] ), REMOVEFILTERS ( 'Calendar' ),
+			    DATESBETWEEN ( 'Calendar'[Date], _ref - 455, _ref - 90 ), Sales )
+			VAR _recent = CALCULATETABLE ( VALUES ( Customer[Customer ID] ), REMOVEFILTERS ( 'Calendar' ),
+			    DATESBETWEEN ( 'Calendar'[Date], _ref - 89, _ref ), Sales )
+			RETURN
+			    CALCULATE ( [Net Revenue], REMOVEFILTERS ( 'Calendar' ), DATESBETWEEN ( 'Calendar'[Date], _ref - 455, _ref - 90 ),
+			        TREATAS ( EXCEPT ( _before, _recent ), Customer[Customer ID] ) )
+		formatString: "€"#,0
+		displayFolder: 5 Customers
+		lineageTag: 76ca7a54-28a9-5163-ab87-baa7549744e2
+
+	measure 'Revenue per Customer' = DIVIDE ( [Net Revenue], [Active Customers] )
+		formatString: "€"#,0
+		displayFolder: 5 Customers
+		lineageTag: 85422dc7-b1ac-59e3-a514-c4300d52284c
+
+	measure 'Last Actual Date' = CALCULATE ( MAX ( Sales[Order Date] ), REMOVEFILTERS () )
+		formatString: dd.mm.yyyy
+		displayFolder: 9 Report
+		lineageTag: 9cd6f5d4-02da-5c10-b451-258784507348
+
+	measure 'Overview Subtitle' =
+			"Data through " & FORMAT ( [Last Actual Date], "dd.mm.yyyy" )
+			    & "  ·  Target achievement " & FORMAT ( [Target Achievement %], "0.0%" )
+			    & "  ·  Forecast " & FORMAT ( [Full Year Forecast] / 1000000, "€0.0" ) & "M of " & FORMAT ( [Full Year Target] / 1000000, "€0.0" ) & "M"
+		displayFolder: 9 Report
+		lineageTag: a957dc05-2595-592b-928b-4e7820fb0bd1
+
+	/// Used for conditional formatting: green >= 100%, amber >= 90%, red below.
+	measure 'Achievement Color' =
+			VAR _a = [Target Achievement %]
+			RETURN SWITCH ( TRUE (), ISBLANK ( _a ), "#9AA6AF", _a >= 1, "#0E6B63", _a >= 0.9, "#C98A0B", "#C0392B" )
+		displayFolder: 9 Report
+		lineageTag: e5a93d61-34e4-5b81-9e5e-7f41ae1a53e2
+
+	column 'Order ID'
+		dataType: string
+		lineageTag: 18f79582-8f92-55b7-9269-7ffd363bb662
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = User
+
+	column 'Line No'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 84fc9971-9482-5f05-8395-1c346c611729
+		summarizeBy: none
+		sourceColumn: line_no
+
+		annotation SummarizationSetBy = User
+
+	column 'Order Date'
+		dataType: dateTime
+		isHidden
+		formatString: dd.mm.yyyy
+		lineageTag: 102e2605-c0ca-510f-b73f-45566f8f3b8e
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f05a43f5-6ae3-59df-82c9-dcf0634323ab
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = User
+
+	column 'Customer SK'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 936e3439-d3f3-59a5-8eb2-20eb114b736f
+		summarizeBy: none
+		sourceColumn: customer_sk
+
+		annotation SummarizationSetBy = User
+
+	column 'Product SK'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: dde8a95a-6ce7-514d-8587-7aafce757056
+		summarizeBy: none
+		sourceColumn: product_sk
+
+		annotation SummarizationSetBy = User
+
+	column 'Country Code'
+		dataType: string
+		isHidden
+		lineageTag: 87c8e720-11b1-5728-8505-c8100198e467
+		summarizeBy: none
+		sourceColumn: country_code
+
+		annotation SummarizationSetBy = User
+
+	column 'Channel Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 353fb804-292c-5979-94c4-d7661223410e
+		summarizeBy: none
+		sourceColumn: channel_key
+
+		annotation SummarizationSetBy = User
+
+	column Status
+		dataType: string
+		lineageTag: d430cd64-49b8-5d15-9341-3f9e0e025fb2
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = User
+
+	column 'Is Return'
+		dataType: boolean
+		isHidden
+		lineageTag: 344a3781-6ee1-5566-be86-274efec75721
+		summarizeBy: none
+		sourceColumn: is_return
+
+		annotation SummarizationSetBy = User
+
+	column Quantity
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: b06716ab-2bdd-5819-8d86-17f948536463
+		summarizeBy: none
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = User
+
+	column 'Unit Price Local'
+		dataType: double
+		isHidden
+		formatString: #,0.00
+		lineageTag: 202c130b-2093-5ccd-8e0e-42efa8be5141
+		summarizeBy: none
+		sourceColumn: unit_price_local
+
+		annotation SummarizationSetBy = User
+
+	column 'Discount Pct'
+		dataType: double
+		isHidden
+		formatString: 0.0
+		lineageTag: e1c74e82-c247-5c6c-8c8f-f8aa069cd24e
+		summarizeBy: none
+		sourceColumn: discount_pct
+
+		annotation SummarizationSetBy = User
+
+	column 'Invoice Currency'
+		dataType: string
+		lineageTag: 01dcb2be-770f-5f19-be4a-245dfb3c6a71
+		summarizeBy: none
+		sourceColumn: currency
+
+		annotation SummarizationSetBy = User
+
+	column 'FX Rate'
+		dataType: double
+		isHidden
+		formatString: 0.0000
+		lineageTag: a6d68c35-fdc4-5fed-8bf1-7522476b7137
+		summarizeBy: none
+		sourceColumn: fx_rate
+
+		annotation SummarizationSetBy = User
+
+	column 'Planning Rate'
+		dataType: double
+		isHidden
+		formatString: 0.0000
+		lineageTag: 0b0a6a0f-5c75-589b-b6b6-8a24c488e275
+		summarizeBy: none
+		sourceColumn: planning_rate
+
+		annotation SummarizationSetBy = User
+
+	column 'Gross Local'
+		dataType: double
+		isHidden
+		formatString: #,0.00
+		lineageTag: 3232dcae-4c91-5844-9292-4b6c0f2e7cb9
+		summarizeBy: none
+		sourceColumn: gross_local
+
+		annotation SummarizationSetBy = User
+
+	column 'Net Local'
+		dataType: double
+		isHidden
+		formatString: #,0.00
+		lineageTag: ba3833eb-6bb0-5535-bb14-984b9f12452e
+		summarizeBy: none
+		sourceColumn: net_local
+
+		annotation SummarizationSetBy = User
+
+	column 'Gross EUR'
+		dataType: double
+		isHidden
+		formatString: "€"#,0
+		lineageTag: 02f4f11e-c753-57b7-85ad-3b87d6f72295
+		summarizeBy: none
+		sourceColumn: gross_eur
+
+		annotation SummarizationSetBy = User
+
+	column 'Discount EUR'
+		dataType: double
+		isHidden
+		formatString: "€"#,0
+		lineageTag: 1f02f8ee-1a48-5c1b-8d67-80226e77c44e
+		summarizeBy: none
+		sourceColumn: discount_eur
+
+		annotation SummarizationSetBy = User
+
+	column 'Net EUR'
+		dataType: double
+		isHidden
+		formatString: "€"#,0
+		lineageTag: cfa17c45-cc11-530e-b9ff-114a07555020
+		summarizeBy: none
+		sourceColumn: net_eur
+
+		annotation SummarizationSetBy = User
+
+	column 'Net EUR at Plan FX'
+		dataType: double
+		isHidden
+		formatString: "€"#,0
+		lineageTag: 105bcc98-e3d0-520a-923d-c5a2fe839f7e
+		summarizeBy: none
+		sourceColumn: net_eur_plan_fx
+
+		annotation SummarizationSetBy = User
+
+	column 'Cost EUR'
+		dataType: double
+		isHidden
+		formatString: "€"#,0
+		lineageTag: 0950ca0c-d0e1-5a3b-a334-401cf9b5cabe
+		summarizeBy: none
+		sourceColumn: cost_eur
+
+		annotation SummarizationSetBy = User
+
+	column 'Source File'
+		dataType: string
+		isHidden
+		lineageTag: e6937561-4470-53e2-89b8-f75d787ebb25
+		summarizeBy: none
+		sourceColumn: source_file
+
+		annotation SummarizationSetBy = User
+
+	partition Sales = m
+		mode: import
+		source =
+				let
+				    Source = fnReadGold("fact_sales"),
+				    Typed = Table.TransformColumnTypes(Source, {{"order_id", type text}, {"line_no", Int64.Type}, {"order_date", type date}, {"date_key", Int64.Type}, {"customer_sk", Int64.Type}, {"product_sk", Int64.Type}, {"country_code", type text}, {"channel_key", Int64.Type}, {"status", type text}, {"is_return", type logical}, {"quantity", Int64.Type}, {"unit_price_local", type number}, {"discount_pct", type number}, {"currency", type text}, {"fx_rate", type number}, {"planning_rate", type number}, {"gross_local", type number}, {"net_local", type number}, {"gross_eur", type number}, {"discount_eur", type number}, {"net_eur", type number}, {"net_eur_plan_fx", type number}, {"cost_eur", type number}, {"source_file", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

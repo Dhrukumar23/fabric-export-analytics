@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "ValdoraSales"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "3a22c408-1a04-5a10-9d52-e046cbff0c49"
+  }
+}
