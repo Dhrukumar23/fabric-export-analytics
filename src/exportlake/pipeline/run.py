@@ -188,8 +188,8 @@ def run(root: Path, until: date | None = None, allow_network: bool = True, write
 
     fact_target = _build_targets(paths, log, run_day)
     fact_fx = rates.select(pl.col("rate_date").alias("date"),
-                           (pl.col("rate_date").dt.year() * 10000 + pl.col("rate_date").dt.month() * 100
-                            + pl.col("rate_date").dt.day()).cast(pl.Int32).alias("date_key"),
+                           (pl.col("rate_date").dt.year() * 10000 + pl.col("rate_date").dt.month().cast(pl.Int32) * 100
+                            + pl.col("rate_date").dt.day().cast(pl.Int32)).cast(pl.Int32).alias("date_key"),
                            "currency", "rate_per_eur").filter(pl.col("date") >= HISTORY_START)
 
     # ---- data-quality log (append) and quarantine
@@ -198,8 +198,8 @@ def run(root: Path, until: date | None = None, allow_network: bool = True, write
         pl.lit(run_id).alias("run_id"),
         pl.lit(now.replace(tzinfo=None)).alias("run_timestamp"),
     ).with_columns(
-        (pl.col("check_date").dt.year() * 10000 + pl.col("check_date").dt.month() * 100
-         + pl.col("check_date").dt.day()).cast(pl.Int32).alias("date_key"),
+        (pl.col("check_date").dt.year() * 10000 + pl.col("check_date").dt.month().cast(pl.Int32) * 100
+         + pl.col("check_date").dt.day().cast(pl.Int32)).cast(pl.Int32).alias("date_key"),
         pl.col("rows_checked").cast(pl.Int64), pl.col("rows_failed").cast(pl.Int64))
     prev_dq = _read_gold(paths, "fact_data_quality")
     fact_dq = dq_new if prev_dq is None else pl.concat([prev_dq, dq_new], how="vertical_relaxed")
@@ -269,8 +269,8 @@ def _build_sales(new_lines: list[pl.DataFrame], products: pl.DataFrame, rates: p
         ((gross - disc) / pl.col("planning_rate")).round(2).alias("net_eur_plan_fx"),
         (pl.col("quantity") * pl.col("unit_cost_eur")).round(2).alias("cost_eur"),
         (pl.col("status") == "Retoure").alias("is_return"),
-        (pl.col("order_date").dt.year() * 10000 + pl.col("order_date").dt.month() * 100
-         + pl.col("order_date").dt.day()).cast(pl.Int32).alias("date_key"),
+        (pl.col("order_date").dt.year() * 10000 + pl.col("order_date").dt.month().cast(pl.Int32) * 100
+         + pl.col("order_date").dt.day().cast(pl.Int32)).cast(pl.Int32).alias("date_key"),
     )
     return df.select(
         "order_id", "line_no", "order_date", "date_key", "customer_sk", "product_sk",
@@ -291,7 +291,7 @@ def _build_targets(paths: Paths, log, run_day: date) -> pl.DataFrame:
     return df.select(
         pl.col("country_name").replace_strict(name_to_code).alias("country_code"),
         "month_start",
-        (pl.col("month_start").dt.year() * 10000 + pl.col("month_start").dt.month() * 100 + 1).cast(pl.Int32).alias("date_key"),
+        (pl.col("month_start").dt.year() * 10000 + pl.col("month_start").dt.month().cast(pl.Int32) * 100 + 1).cast(pl.Int32).alias("date_key"),
         (pl.col("target_eur") * 1000).round(0).alias("target_eur"),
     ).filter(pl.col("target_eur") > 0).sort(["month_start", "country_code"])
 

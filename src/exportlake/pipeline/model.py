@@ -16,7 +16,7 @@ SCD2_TRACKED = ("segment", "is_key_account", "sales_rep")
 def dim_date(start: date, end: date, last_actual: date) -> pl.DataFrame:
     df = pl.DataFrame({"date": pl.date_range(start, end, "1d", eager=True)})
     return df.with_columns(
-        (pl.col("date").dt.year() * 10000 + pl.col("date").dt.month() * 100 + pl.col("date").dt.day()).cast(pl.Int32).alias("date_key"),
+        (pl.col("date").dt.year() * 10000 + pl.col("date").dt.month().cast(pl.Int32) * 100 + pl.col("date").dt.day().cast(pl.Int32)).cast(pl.Int32).alias("date_key"),
         pl.col("date").dt.year().cast(pl.Int32).alias("year"),
         pl.col("date").dt.quarter().cast(pl.Int32).alias("quarter_no"),
         ("Q" + pl.col("date").dt.quarter().cast(pl.String)).alias("quarter"),

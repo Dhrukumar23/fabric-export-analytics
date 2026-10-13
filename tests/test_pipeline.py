@@ -159,3 +159,14 @@ def test_scd2_change_and_inferred_member():
     row = dim.to_frame().filter(pl.col("customer_sk") == sk3)
     assert row["is_inferred"][0] is False and row["customer_name"][0] == "B SAS"
     assert dim.to_frame().filter(pl.col("customer_id") == "C20000").height == 1
+
+
+def test_dimension_keys_unique_and_correct(lake):
+    """Power BI rejects a relationship if the 'one' side has duplicate keys."""
+    for dim, key in [("dim_date", "date_key"), ("dim_customer", "customer_sk"), ("dim_product", "product_sk"),
+                     ("dim_country", "country_code"), ("dim_channel", "channel_key")]:
+        assert gold(lake, dim)[key].is_duplicated().sum() == 0, f"{dim}.{key} has duplicates"
+    d = gold(lake, "dim_date").with_columns(pl.col("date").dt.strftime("%Y%m%d").cast(pl.Int32).alias("expected"))
+    assert (d["date_key"] == d["expected"]).all()
+    f = gold(lake, "fact_sales").with_columns(pl.col("order_date").dt.strftime("%Y%m%d").cast(pl.Int32).alias("expected"))
+    assert (f["date_key"] == f["expected"]).all()
