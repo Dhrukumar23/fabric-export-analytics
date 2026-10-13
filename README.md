@@ -79,13 +79,13 @@ Every source has a versioned YAML contract (`src/exportlake/contracts/`) with ty
 | Contract checks run | 31,000+ |
 | Rows quarantined with a reason | 235 |
 | Values auto-fixed | 768 |
-| Duplicate lines removed | 406 |
+| Duplicate lines removed | 408 |
 | Late-arriving customers handled | 14 inferred members, all completed |
 
-**Insights the model surfaces:**
-- **Distributors and Key Accounts carry the lowest gross margin (36–38%)** because of 11–20% average discounts; SME workshops earn 47% at a 2% discount.
-- **Every European market is below its year-to-date target**, while the **USA (≈120%) and Japan (≈104%)**, both entered in 2025, beat their budgets.
-- **PLN and JPY weakness cost about €210k** against planning rates in 2026, partly offset by a stronger CHF and SEK.
+**Insights the model surfaces** (2026 year to date, with live ECB rates, October 2026):
+- **Distributors and Key Accounts carry the lowest gross margin (34–36%)** because of 11–20% average discounts; SME workshops earn about 46% at a 2% discount.
+- **Every European market is below its year-to-date target** (87–98%), while the **USA and Japan (≈107% and ≈106%)**, both entered in 2025, beat their budgets.
+- **A weaker JPY and PLN cost about €54k** against planning rates, offset almost exactly by a stronger GBP, USD and CHF. The net currency effect is close to zero, but it hides real swings per market.
 
 ## Run it yourself
 
