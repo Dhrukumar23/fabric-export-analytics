@@ -1,5 +1,5 @@
 {
-  "last_business_date": "2026-10-12",
+  "last_business_date": "2026-10-13",
   "runs": [
     {
       "run_id": "a4fd65f230f6",
@@ -7,6 +7,14 @@
       "days": 972,
       "rows_loaded": 46932,
       "rows_quarantined": 234,
+      "fx_source": "ECB Data Portal (live)"
+    },
+    {
+      "run_id": "2d3c211f1622",
+      "started": "2026-10-14T10:13:55+00:00",
+      "days": 1,
+      "rows_loaded": 108,
+      "rows_quarantined": 0,
       "fx_source": "ECB Data Portal (live)"
     }
   ]
