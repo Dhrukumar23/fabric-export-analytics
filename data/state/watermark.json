@@ -1,5 +1,5 @@
 {
-  "last_business_date": "2026-10-15",
+  "last_business_date": "2026-10-16",
   "runs": [
     {
       "run_id": "a4fd65f230f6",
@@ -32,6 +32,14 @@
       "rows_loaded": 66,
       "rows_quarantined": 0,
       "fx_source": "Synthetic fallback (ECB offline)"
+    },
+    {
+      "run_id": "7628fca59fb1",
+      "started": "2026-10-17T09:22:17+00:00",
+      "days": 1,
+      "rows_loaded": 62,
+      "rows_quarantined": 0,
+      "fx_source": "ECB Data Portal (live)"
     }
   ]
 }
