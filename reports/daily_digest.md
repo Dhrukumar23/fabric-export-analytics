@@ -1,4 +1,4 @@
-# Daily sales digest · data up to 2026-10-24
+# Daily sales digest · data up to 2026-10-25
 
 **Last business day (2026-10-23):** €75k net revenue (-38% vs the average of the last 8 same weekdays).
 **Year to date:** €23.19M against a pro-rata target of €24.67M (**94.0%**). Currency effect vs planning rates: €6k.
@@ -9,7 +9,7 @@
 |---|---:|---:|---:|---:|
 | United Kingdom ⚠️ | €1.91M | 86% | 92% | €26k |
 | Poland ⚠️ | €2.19M | 88% | 92% | €-24k |
-| Italy | €1.93M | 90% | 113% | €0k |
+| Italy ⚠️ | €1.93M | 90% | 113% | €0k |
 | Switzerland | €1.83M | 90% | 86% | €12k |
 | Sweden | €1.62M | 90% | 117% | €3k |
 | Germany | €6.20M | 92% | 96% | €0k |
