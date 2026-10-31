@@ -1,165 +1,172 @@
 {
-  "last_business_date": "2026-10-29",
-  "last_data_date": "2026-10-29",
-  "last_day_revenue": 140453.74,
-  "same_weekday_avg": 120044.74125,
-  "month_share_elapsed": 0.9545454545454546,
+  "last_business_date": "2026-10-30",
+  "last_data_date": "2026-10-30",
+  "last_day_revenue": 161814.04,
+  "same_weekday_avg": 122506.38249999999,
+  "month_share_elapsed": 1.0,
   "countries": [
     {
       "country_code": "PL",
       "country": "Poland",
-      "mtd": 256175.25999999998,
+      "mtd": 256976.40999999997,
       "target_eur": 296600.0,
-      "ytd": 2232037.2699999996,
-      "ytd_plan_fx": 2257309.98,
+      "ytd": 2232838.42,
+      "ytd_plan_fx": 2258142.6500000004,
       "ytd_target_closed": 2264900.0,
-      "ytd_target": 2548018.1818181816,
-      "mtd_pace": 0.9048350704813279,
-      "ytd_ach": 0.8759895380366916,
-      "fx_impact": -25272.71000000043
+      "ytd_target": 2561500.0,
+      "mtd_pace": 0.8664073162508428,
+      "ytd_ach": 0.8716917509271911,
+      "fx_impact": -25304.230000000447
     },
     {
       "country_code": "GB",
       "country": "United Kingdom",
-      "mtd": 266786.11,
+      "mtd": 279346.03,
       "target_eur": 256800.0,
-      "ytd": 1995143.2999999996,
-      "ytd_plan_fx": 1965177.1499999997,
+      "ytd": 2007703.22,
+      "ytd_plan_fx": 1977141.57,
       "ytd_target_closed": 2027700.0,
-      "ytd_target": 2272827.272727273,
-      "mtd_pace": 1.0883575174306481,
-      "ytd_ach": 0.8778244277251799,
-      "fx_impact": 29966.149999999907
+      "ytd_target": 2284500.0,
+      "mtd_pace": 1.0877960669781932,
+      "ytd_ach": 0.878837040927993,
+      "fx_impact": 30561.649999999907
     },
     {
       "country_code": "CH",
       "country": "Switzerland",
-      "mtd": 195171.58000000002,
+      "mtd": 201383.12000000002,
       "target_eur": 236900.0,
-      "ytd": 1864961.9799999995,
-      "ytd_plan_fx": 1852268.4600000002,
+      "ytd": 1871173.5199999996,
+      "ytd_plan_fx": 1858407.22,
       "ytd_target_closed": 1845200.0,
-      "ytd_target": 2071331.8181818181,
-      "mtd_pace": 0.8630876520131058,
-      "ytd_ach": 0.9003685279343767,
-      "fx_impact": 12693.51999999932
+      "ytd_target": 2082100.0,
+      "mtd_pace": 0.8500764879696076,
+      "ytd_ach": 0.8986953172277986,
+      "fx_impact": 12766.29999999958
     },
     {
       "country_code": "IT",
       "country": "Italy",
-      "mtd": 257895.03000000003,
+      "mtd": 271494.67,
       "target_eur": 247900.0,
-      "ytd": 1974401.99,
-      "ytd_plan_fx": 1974401.99,
+      "ytd": 1988001.63,
+      "ytd_plan_fx": 1988001.63,
       "ytd_target_closed": 1955800.0,
-      "ytd_target": 2192431.8181818184,
-      "mtd_pace": 1.0898577882786837,
-      "ytd_ach": 0.9005534282189763,
+      "ytd_target": 2203700.0,
+      "mtd_pace": 1.0951781766841469,
+      "ytd_ach": 0.9021199028905931,
       "fx_impact": 0.0
     },
     {
       "country_code": "SE",
       "country": "Sweden",
-      "mtd": 218227.85,
+      "mtd": 234966.87999999998,
       "target_eur": 208400.0,
-      "ytd": 1654492.1500000001,
-      "ytd_plan_fx": 1651476.3800000001,
+      "ytd": 1671231.1799999997,
+      "ytd_plan_fx": 1668254.6800000006,
       "ytd_target_closed": 1636000.0,
-      "ytd_target": 1834927.2727272727,
-      "mtd_pace": 1.0970232839776985,
-      "ytd_ach": 0.9016663355495884,
-      "fx_impact": 3015.7700000000186
+      "ytd_target": 1844400.0,
+      "mtd_pace": 1.1274802303262954,
+      "ytd_ach": 0.9061110279765776,
+      "fx_impact": 2976.4999999990687
     },
     {
       "country_code": "DE",
       "country": "Germany",
-      "mtd": 721197.9100000001,
+      "mtd": 796381.32,
       "target_eur": 781700.0,
-      "ytd": 6342532.019999999,
-      "ytd_plan_fx": 6342532.019999999,
+      "ytd": 6417715.429999999,
+      "ytd_plan_fx": 6417715.429999999,
       "ytd_target_closed": 6120300.0,
-      "ytd_target": 6866468.181818182,
-      "mtd_pace": 0.9665353302021846,
-      "ytd_ach": 0.9236964116129569,
+      "ytd_target": 6902000.0,
+      "mtd_pace": 1.0187812715875655,
+      "ytd_ach": 0.9298341683569978,
       "fx_impact": 0.0
     },
     {
       "country_code": "FR",
       "country": "France",
-      "mtd": 241647.36,
+      "mtd": 257207.60999999996,
       "target_eur": 326200.0,
-      "ytd": 2814134.7699999996,
-      "ytd_plan_fx": 2814134.7699999996,
+      "ytd": 2829695.02,
+      "ytd_plan_fx": 2829695.02,
       "ytd_target_closed": 2575400.0,
-      "ytd_target": 2886772.7272727275,
-      "mtd_pace": 0.7760710519400893,
-      "ytd_ach": 0.9748376598592323,
+      "ytd_target": 2901600.0,
+      "mtd_pace": 0.7884966584917228,
+      "ytd_ach": 0.9752188516680452,
       "fx_impact": 0.0
     },
     {
       "country_code": "US",
       "country": "United States",
-      "mtd": 366279.06999999995,
+      "mtd": 382916.67999999993,
       "target_eur": 401400.0,
-      "ytd": 3280443.1600000006,
-      "ytd_plan_fx": 3257067.2600000002,
+      "ytd": 3297080.770000001,
+      "ytd_plan_fx": 3273044.170000001,
       "ytd_target_closed": 2711400.0,
-      "ytd_target": 3094554.5454545454,
-      "mtd_pace": 0.9559564785156711,
-      "ytd_ach": 1.060069587339638,
-      "fx_impact": 23375.900000000373
+      "ytd_target": 3112800.0,
+      "mtd_pace": 0.9539528649725958,
+      "ytd_ach": 1.059200966975071,
+      "fx_impact": 24036.600000000093
     },
     {
       "country_code": "JP",
       "country": "Japan",
-      "mtd": 228169.12999999998,
+      "mtd": 232690.61999999994,
       "target_eur": 197900.0,
-      "ytd": 1554495.85,
-      "ytd_plan_fx": 1587437.6400000001,
+      "ytd": 1559017.34,
+      "ytd_plan_fx": 1591869.74,
       "ytd_target_closed": 1253300.0,
-      "ytd_target": 1442204.5454545454,
-      "mtd_pace": 1.2078541013980122,
-      "ytd_ach": 1.077860872716958,
-      "fx_impact": -32941.79000000004
+      "ytd_target": 1451200.0,
+      "mtd_pace": 1.1757989893885799,
+      "ytd_ach": 1.0742953004410143,
+      "fx_impact": -32852.39999999991
     }
   ],
-  "anomalies": [],
+  "anomalies": [
+    {
+      "country_code": "DE",
+      "revenue": 75183.41,
+      "median": 29790.77,
+      "z": 5.2
+    }
+  ],
   "margin_drift": [
     {
-      "segment": "SME Workshop",
-      "gm": 0.44909386968718606,
-      "gm_prev": 0.4573825732031663,
-      "pp": -0.8288703515980211
-    },
-    {
       "segment": "Distributor",
-      "gm": 0.33339295202257946,
-      "gm_prev": 0.33801517820706223,
-      "pp": -0.46222261844827695
+      "gm": 0.33641200166956775,
+      "gm_prev": 0.3385137097651172,
+      "pp": -0.21017080955494372
     },
     {
-      "segment": "Key Account",
-      "gm": 0.36625164700160573,
-      "gm_prev": 0.36270014114235466,
-      "pp": 0.35515058592510695
+      "segment": "SME Workshop",
+      "gm": 0.4560486171893799,
+      "gm_prev": 0.454594545928332,
+      "pp": 0.14540712610479067
     },
     {
       "segment": "Industrial OEM",
-      "gm": 0.4200524746357792,
-      "gm_prev": 0.4149544853018281,
-      "pp": 0.5097989333951114
+      "gm": 0.42096837296160405,
+      "gm_prev": 0.41523833214604183,
+      "pp": 0.5730040815562221
+    },
+    {
+      "segment": "Key Account",
+      "gm": 0.36980618982918284,
+      "gm_prev": 0.36267748631696334,
+      "pp": 0.7128703512219503
     }
   ],
   "dq": {
-    "run_id": "ccb69efda5c2",
-    "checks": 77,
+    "run_id": "1d6b2299ca7f",
+    "checks": 65,
     "errors": 0,
     "auto_fixed": 0,
     "fx_source": "ECB Data Portal (live)"
   },
   "ytd": {
-    "revenue": 23712642.49,
-    "target": 25209536.363636367,
-    "fx_impact": 10836.839999999152
+    "revenue": 23874456.529999997,
+    "target": 25343800.0,
+    "fx_impact": 12184.419999998296
   }
 }
