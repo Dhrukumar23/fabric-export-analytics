@@ -1,6 +1,6 @@
 {
   "last_business_date": "2026-11-13",
-  "last_data_date": "2026-11-14",
+  "last_data_date": "2026-11-15",
   "last_day_revenue": 183914.91,
   "same_weekday_avg": 115667.22375,
   "month_share_elapsed": 0.47619047619047616,
@@ -8,15 +8,15 @@
     {
       "country_code": "PL",
       "country": "Poland",
-      "mtd": 91976.79,
+      "mtd": 90063.88,
       "target_eur": 279800.0,
-      "ytd": 2334774.21,
-      "ytd_plan_fx": 2363984.3,
+      "ytd": 2332861.3,
+      "ytd_plan_fx": 2361992.7399999998,
       "ytd_target_closed": 2561500.0,
       "ytd_target": 2694738.095238095,
-      "mtd_pace": 0.6903190100071479,
-      "ytd_ach": 0.8664197140812342,
-      "fx_impact": -29210.08999999985
+      "mtd_pace": 0.6759619299499643,
+      "ytd_ach": 0.8657098454660317,
+      "fx_impact": -29131.439999999944
     },
     {
       "country_code": "GB",
@@ -127,9 +127,9 @@
   "margin_drift": [
     {
       "segment": "Industrial OEM",
-      "gm": 0.420008732651407,
-      "gm_prev": 0.41676404437659964,
-      "pp": 0.3244688274807339
+      "gm": 0.42005352714099464,
+      "gm_prev": 0.416748869524066,
+      "pp": 0.33046576169286634
     },
     {
       "segment": "SME Workshop",
@@ -139,27 +139,27 @@
     },
     {
       "segment": "Key Account",
-      "gm": 0.37342658568111314,
-      "gm_prev": 0.3626689992470149,
-      "pp": 1.0757586434098243
+      "gm": 0.37332208505980974,
+      "gm_prev": 0.36270359515942996,
+      "pp": 1.061848990037978
     },
     {
       "segment": "Distributor",
-      "gm": 0.34855480060864263,
+      "gm": 0.3491962879401947,
       "gm_prev": 0.33524459769044473,
-      "pp": 1.33102029181979
+      "pp": 1.395169024974996
     }
   ],
   "dq": {
-    "run_id": "175d72987592",
-    "checks": 65,
+    "run_id": "c0445ba29c7e",
+    "checks": 77,
     "errors": 0,
     "auto_fixed": 0,
-    "fx_source": "Synthetic fallback (ECB offline)"
+    "fx_source": "ECB Data Portal (live)"
   },
   "ytd": {
-    "revenue": 25231541.299999997,
+    "revenue": 25229628.389999997,
     "target": 26662419.047619045,
-    "fx_impact": 12188.529999999097
+    "fx_impact": 12267.179999999003
   }
 }
