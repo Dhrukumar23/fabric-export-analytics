@@ -23,5 +23,5 @@
 
 ## Data quality (this run)
 
-- 65 contract checks · 0 rows quarantined · 0 values auto-fixed
+- 48 contract checks · 0 rows quarantined · 0 values auto-fixed
 - FX source: ECB Data Portal (live)
