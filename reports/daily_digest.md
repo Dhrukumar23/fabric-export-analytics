@@ -1,21 +1,21 @@
-# Daily sales digest · data up to 2026-11-26
+# Daily sales digest · data up to 2026-11-27
 
-**Last business day (2026-11-26):** €76k net revenue (-37% vs the average of the last 8 same weekdays).
-**Year to date:** €26.36M against a pro-rata target of €27.85M (**94.6%**). Currency effect vs planning rates: €20k.
+**Last business day (2026-11-27):** €146k net revenue (+13% vs the average of the last 8 same weekdays).
+**Year to date:** €26.50M against a pro-rata target of €27.98M (**94.7%**). Currency effect vs planning rates: €22k.
 
 ## Target achievement by country (YTD, pro-rata)
 
 | Country | YTD revenue | Achievement | Month pace | FX effect |
 |---|---:|---:|---:|---:|
-| Poland ⚠️ | €2.42M | 86% | 71% | €-33k |
-| United Kingdom ⚠️ | €2.18M | 87% | 79% | €36k |
-| Switzerland ⚠️ | €2.04M | 90% | 87% | €16k |
-| Sweden | €1.88M | 93% | 118% | €1k |
-| Italy | €2.25M | 93% | 125% | €0k |
-| Germany | €7.07M | 94% | 99% | €0k |
-| France | €3.11M | 98% | 100% | €0k |
-| United States | €3.60M | 104% | 87% | €36k |
-| Japan | €1.80M | 111% | 140% | €-36k |
+| Poland ⚠️ | €2.43M | 86% | 71% | €-34k |
+| United Kingdom ⚠️ | €2.21M | 88% | 88% | €37k |
+| Switzerland | €2.08M | 91% | 99% | €16k |
+| Italy | €2.25M | 93% | 119% | €0k |
+| Sweden | €1.89M | 93% | 117% | €1k |
+| Germany | €7.10M | 93% | 98% | €0k |
+| France | €3.11M | 98% | 97% | €0k |
+| United States | €3.62M | 104% | 88% | €37k |
+| Japan | €1.82M | 111% | 140% | €-35k |
 
 ## Unusual activity
 
@@ -23,5 +23,5 @@
 
 ## Data quality (this run)
 
-- 66 contract checks · 0 rows quarantined · 1 values auto-fixed
+- 65 contract checks · 1 rows quarantined · 0 values auto-fixed
 - FX source: ECB Data Portal (live)
